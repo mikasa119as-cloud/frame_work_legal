@@ -1,416 +1,1488 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Legal Command Center</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<style>
-:root{
-  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
-  --bg:#EEF1F6;--surface:#FFFFFF;--surface2:#F5F7FB;--line:#E1E7F0;--text:#0F172A;--muted:#55657D;--faint:#8593A8;
-  --navy:#0D2143;--navy2:#15305B;--gold:#E5BA73;--goldtx:#9A6B10;
-  --ok:#047857;--wip:#B45309;--bad:#DC2626;--idle:#64748B;
-  --ok-bg:#ECFDF5;--wip-bg:#FFFBEB;--bad-bg:#FEF2F2;--idle-bg:#F1F5F9;--info-bg:#EFF6FF;--info:#1D4ED8;
-  --c-ok:#059669;--c-wip:#D97706;--c-bad:#E11D48;--c-idle:#94A3B8;
-  --focus:#2563EB;
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#070D19;--surface:#0E1A2E;--surface2:#12233A;--line:#1E3350;--text:#E6ECF5;--muted:#9CABC1;--faint:#71829B;
-    --navy:#0A1830;--navy2:#15305B;--goldtx:#E5BA73;
-    --ok:#34D399;--wip:#FBBF24;--bad:#F87171;--idle:#94A3B8;
-    --ok-bg:#0B2A22;--wip-bg:#2B2210;--bad-bg:#2E1517;--idle-bg:#16263C;--info-bg:#10264A;--info:#93C5FD;
-    --c-ok:#10B981;--c-wip:#F59E0B;--c-bad:#F43F5E;--c-idle:#64748B;--focus:#60A5FA;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#070D19;--surface:#0E1A2E;--surface2:#12233A;--line:#1E3350;--text:#E6ECF5;--muted:#9CABC1;--faint:#71829B;
-  --navy:#0A1830;--navy2:#15305B;--goldtx:#E5BA73;
-  --ok:#34D399;--wip:#FBBF24;--bad:#F87171;--idle:#94A3B8;
-  --ok-bg:#0B2A22;--wip-bg:#2B2210;--bad-bg:#2E1517;--idle-bg:#16263C;--info-bg:#10264A;--info:#93C5FD;
-  --c-ok:#10B981;--c-wip:#F59E0B;--c-bad:#F43F5E;--c-idle:#64748B;--focus:#60A5FA;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
-body{height:100%;display:flex;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:14px;line-height:1.5;overflow:hidden}
-button,input,select{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-h1,h2,h3{line-height:1.25}
-/* sidebar */
-.side{width:250px;flex-shrink:0;background:linear-gradient(180deg,#040A15,#0A1931 60%,#0D2143);color:#CBD5E1;display:flex;flex-direction:column;z-index:40;transition:transform .25s}
-.brand{display:flex;gap:12px;align-items:center;padding:18px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
-.logo{width:40px;height:40px;border-radius:11px;background:var(--gold);display:grid;place-items:center;color:#0A1931;flex-shrink:0}
-.brand b{display:block;font-size:14px;color:#fff;font-weight:800}
-.brand span{font-size:11.5px;color:#8FA0B8}
-.side nav{flex:1;overflow-y:auto;padding:10px}
-.ngrp{font-size:11.5px;font-weight:600;color:#7C8DA6;padding:14px 10px 5px}
-.nav{display:flex;align-items:center;gap:11px;width:100%;padding:9px 11px;margin-bottom:2px;border:0;border-radius:10px;background:none;text-align:left;font-size:13px;font-weight:600;color:#A9B7CB;cursor:pointer}
-.nav svg{width:17px;height:17px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.nav:hover{background:rgba(255,255,255,.06);color:#fff}
-.nav[aria-current="page"]{background:rgba(229,186,115,.14);color:#fff;box-shadow:inset 3px 0 0 var(--gold)}
-.nav[aria-current="page"] svg{color:var(--gold)}
-.nb{margin-left:auto;min-width:22px;text-align:center;font-size:11px;font-weight:800;padding:1px 7px;border-radius:99px;background:#F87171;color:#2A0A0A}
-.sfoot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:11.5px;color:#8FA0B8;line-height:1.5}
-.sfoot b{display:block;color:#E2E8F0;font-size:12.5px}
-#scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:39}
-#scrim.on{display:block}
-/* main */
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
-.top{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--line);flex-shrink:0}
-#menu{display:none;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;place-items:center}
-#menu svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.top h1{font-size:17px;font-weight:800}
-.top p{font-size:12px;color:var(--muted)}
-.asof{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:99px;padding:5px 12px;white-space:nowrap}
-#view{flex:1;overflow-y:auto;padding:22px 24px 32px}
-#view>*+*{margin-top:18px}
-/* generic */
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
-.panel h2{font-size:15px;font-weight:800;margin-bottom:2px}
-.sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.g32{display:grid;grid-template-columns:3fr 2fr;gap:18px}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.spread{justify-content:space-between}
-.muted{color:var(--muted)}
-.badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap}
-.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.b-ok{background:var(--ok-bg);color:var(--ok)}.b-wip{background:var(--wip-bg);color:var(--wip)}.b-bad{background:var(--bad-bg);color:var(--bad)}.b-idle{background:var(--idle-bg);color:var(--idle)}
-.pri{display:inline-block;min-width:32px;text-align:center;padding:1px 8px;border-radius:7px;font-size:11.5px;font-weight:800;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
-.pri.p0{background:var(--bad-bg);color:var(--bad);border-color:transparent}
-.pri.p1{background:var(--info-bg);color:var(--info);border-color:transparent}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--text)}
-.btn:hover{background:var(--surface2)}
-.link{border:0;background:none;color:var(--info);font-weight:700;font-size:12.5px;cursor:pointer;padding:0}
-.link:hover{text-decoration:underline}
-/* segmented bars */
-.seg{display:flex;gap:2px;height:10px;border-radius:99px;overflow:hidden;background:var(--idle-bg)}
-.seg i{display:block;min-width:3px}
-.s-ok{background:var(--c-ok)}.s-wip{background:var(--c-wip)}.s-bad{background:var(--c-bad)}.s-idle{background:var(--c-idle)}
-/* hero */
-.hero{background:linear-gradient(135deg,#040A15,var(--navy) 50%,var(--navy2));color:#fff;border-radius:18px;padding:26px 28px}
-.hero{--c-ok:#34D399;--c-wip:#FBBF24;--c-bad:#F87171;--c-idle:#94A3B8}
-.hero .seg{height:16px;background:rgba(255,255,255,.1)}
-.hero-top{display:flex;flex-wrap:wrap;gap:22px 36px;align-items:flex-end;margin-bottom:22px}
-.big{font-size:68px;font-weight:800;line-height:.95;color:var(--gold);letter-spacing:-.03em}
-.big small{font-size:26px;letter-spacing:0}
-.hero-sub{font-size:14px;font-weight:700;margin-top:6px}
-.hero p{font-size:13.5px;line-height:1.7;color:#B7C3D6;max-width:60ch;flex:1;min-width:240px}
-.hero p b{color:#fff}
-.legend{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-size:12.5px;color:#B7C3D6}
-.legend b{font-size:18px;color:#fff;margin-right:5px}
-.legend span{display:inline-flex;align-items:center;gap:8px}
-.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
-/* attention */
-.attn{list-style:none}
-.attn li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
-.attn li:last-child{border-bottom:0;padding-bottom:0}
-.attn li:first-child{padding-top:0}
-.attn .n{flex-shrink:0;min-width:46px;text-align:center;font-size:18px;font-weight:800;padding:3px 0;border-radius:9px}
-.attn .n.bad{background:var(--bad-bg);color:var(--bad)}.attn .n.wip{background:var(--wip-bg);color:var(--wip)}.attn .n.info{background:var(--info-bg);color:var(--info)}
-.attn b{display:block;font-size:13px}
-.attn span.d{font-size:12.5px;color:var(--muted)}
-/* bars list */
-.bl{list-style:none}
-.bl li{padding:9px 0;border-bottom:1px solid var(--line)}
-.bl li:last-child{border-bottom:0}
-.bl .h{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}
-.bl .h b{font-weight:700}
-.bl .h span{color:var(--muted);white-space:nowrap;font-size:12.5px}
-.chart{position:relative}
-/* list view */
-.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.tools .cnt{font-weight:800;font-size:15px;margin-right:4px}
-.fi{border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:7px 11px;font-size:13px;font-weight:500;min-width:0}
-input.fi{min-width:220px;flex:1;max-width:340px}
-.tw{overflow:auto;max-height:calc(100vh - 250px);border:1px solid var(--line);border-radius:14px;background:var(--surface)}
-table{width:100%;border-collapse:collapse}
-th{position:sticky;top:0;z-index:1;background:var(--surface);text-align:left;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
-tr:last-child td{border-bottom:0}
-tbody tr:hover td{background:var(--surface2)}
-.t-title{min-width:240px;max-width:360px;font-weight:600}
-.t-title .nt{font-weight:500;color:var(--muted);font-style:italic}
-.t-title small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
-.rn{color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
-.num{font-variant-numeric:tabular-nums;white-space:nowrap}
-.warn{color:var(--wip);font-weight:700}
-.empty{padding:44px 20px;text-align:center;color:var(--muted)}
-.empty b{display:block;color:var(--text);margin-bottom:4px;font-size:14px}
-/* projects */
-.proj h2{font-size:16px}
-.subs{list-style:none;margin-top:14px}
-.subs li{display:grid;grid-template-columns:1fr auto;gap:4px 14px;padding:10px 0;border-top:1px solid var(--line)}
-.subs .nm{font-weight:600;font-size:13px}
-.subs .dt{font-size:12px;color:var(--muted)}
-.subs details{grid-column:1/-1;margin-top:4px;background:var(--wip-bg);border-radius:10px;padding:9px 12px;font-size:12.5px}
-.subs summary{cursor:pointer;font-weight:700;color:var(--wip)}
-.subs dl{margin-top:8px;display:grid;gap:6px}
-.subs dt{font-weight:700;font-size:12px;color:var(--muted)}
-.subs dd{margin:0}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-/* quality */
-.issue{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:13px 0;border-top:1px solid var(--line)}
-.issue:first-of-type{border-top:0}
-.issue .k{grid-row:span 2;min-width:52px;text-align:center;font-size:18px;font-weight:800;padding:4px 0;border-radius:9px;height:fit-content}
-.issue b{font-size:13px}
-.issue span.d{font-size:12.5px;color:var(--muted)}
-.issue .fix{font-size:12.5px;margin-top:2px}
-.issue .fix em{font-style:normal;font-weight:700;color:var(--goldtx)}
-@media (max-width:1023px){
-  .side{position:fixed;inset:0 auto 0 0;transform:translateX(-100%);padding-top:env(safe-area-inset-top,0px)}
-  .side.on{transform:none}
-  #menu{display:grid}
-  .top{padding:10px 16px}
-  #view{padding:16px 16px 28px}
-  .asof{display:none}
-}
-@media (max-width:820px){
-  .g2,.g32,.pgrid{grid-template-columns:1fr}
-  .big{font-size:54px}
-  .hero{padding:22px 20px}
-  .tw{max-height:none}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warung Pak Cikur — Menu Lengkap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --amber: #f59e0b;
+            --amber-dark: #d97706;
+            --amber-glow: rgba(245,158,11,0.15);
+            --bg-base: #080c14;
+            --bg-surface: #0f1623;
+            --bg-card: #141c2e;
+            --border: rgba(255,255,255,0.07);
+            --text-muted: #64748b;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'DM Sans', sans-serif; background-color: var(--bg-base); color: #cbd5e1; overflow-x: hidden; }
+        h1,h2,h3,h4,.brand { font-family: 'Syne', sans-serif; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: #1e2d45; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--amber); }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(245,158,11,0.4);}70%{box-shadow:0 0 0 12px rgba(245,158,11,0);}100%{box-shadow:0 0 0 0 rgba(245,158,11,0);} }
+        @keyframes shimmer { 0%{background-position:-200% 0;}100%{background-position:200% 0;} }
+        @keyframes toastIn { from{opacity:0;transform:translateX(60px);}to{opacity:1;transform:translateX(0);} }
+        @keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);} }
+        @keyframes cartBounce { 0%,100%{transform:scale(1);}30%{transform:scale(1.2);}60%{transform:scale(0.9);} }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);} }
+        @keyframes marquee { from{transform:translateX(0);}to{transform:translateX(-50%);} }
+        @keyframes checkmark { 0%{stroke-dashoffset:100;}100%{stroke-dashoffset:0;} }
+        @keyframes spin { from{transform:rotate(0deg);}to{transform:rotate(360deg);} }
+        @keyframes popIn { 0%{transform:scale(0.8);opacity:0;}100%{transform:scale(1);opacity:1;} }
+
+        .animate-fade-up { animation: fadeUp 0.6s ease both; }
+        .animate-float   { animation: float 3s ease-in-out infinite; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #fbbf24 0%, #f97316 60%, #fb923c 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(8,12,20,0.85); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border); transition: all 0.3s ease;
+        }
+        .navbar.scrolled { background: rgba(8,12,20,0.97); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+        .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 16px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-links { display: flex; align-items: center; gap: 24px; }
+        .nav-link { font-size: 13px; font-weight: 600; color: #94a3b8; text-decoration: none; transition: color .2s; }
+        .nav-link:hover { color: var(--amber); }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+        .hamburger span { width: 22px; height: 2px; background: #94a3b8; border-radius: 2px; transition: all .3s; }
+        .mobile-menu { display: none; position: fixed; top: 60px; left: 0; right: 0; z-index: 99; background: rgba(8,12,20,0.98); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 16px; flex-direction: column; gap: 4px; animation: slideDown .25s ease; }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a { display: block; padding: 12px 16px; color: #94a3b8; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 10px; transition: all .2s; }
+        .mobile-menu a:hover { background: rgba(245,158,11,0.08); color: var(--amber); }
+
+        .promo-bar { position: fixed; top: 60px; left: 0; right: 0; z-index: 99; padding: 7px 0; overflow: hidden; background: linear-gradient(90deg,rgba(245,158,11,0.1),rgba(249,115,22,0.07),rgba(245,158,11,0.1)); border-bottom: 1px solid rgba(245,158,11,0.12); }
+        .marquee-track { animation: marquee 20s linear infinite; display: flex; gap: 48px; width: max-content; }
+
+        .hero-bg {
+            background-image: linear-gradient(to top, var(--bg-base) 0%, rgba(8,12,20,0.5) 50%, rgba(8,12,20,0.85) 100%), url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&q=80&w=1600');
+            background-size: cover; background-position: center;
+        }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .card:hover { border-color: rgba(245,158,11,0.25); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+
+        .menu-category-tab {
+            padding: 8px 16px; border-radius: 10px; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; border: 1px solid var(--border);
+            background: var(--bg-card); color: #94a3b8; white-space: nowrap; flex-shrink: 0;
+        }
+        .menu-category-tab.active, .menu-category-tab:hover { background: var(--amber); color: #0a0e1a; border-color: var(--amber); }
+
+        .menu-item-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; border-radius: 12px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            transition: all 0.2s; cursor: pointer;
+        }
+        .menu-item-row:hover { border-color: rgba(245,158,11,0.25); background: rgba(20,28,46,0.9); }
+        .menu-item-row .name { flex: 1; font-size: 13px; color: #cbd5e1; font-weight: 500; }
+        .menu-item-row .price { font-size: 13px; font-weight: 700; color: var(--amber); white-space: nowrap; }
+
+        .subcat-header {
+            display: flex; align-items: center; gap: 10px; margin: 20px 0 10px;
+        }
+        .subcat-header .line { flex: 1; height: 1px; background: var(--border); }
+        .subcat-title { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.15); padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+
+        .btn-add {
+            min-width: 32px; height: 32px; border-radius: 9px; background: var(--amber); color: #0a0e1a;
+            border: none; cursor: pointer; font-size: 16px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0;
+        }
+        .btn-add:hover { background: var(--amber-dark); transform: scale(1.08); }
+        .btn-add:active { transform: scale(0.94); }
+
+        .cart-fab {
+            position: fixed; bottom: 24px; right: 20px; z-index: 150;
+            width: 58px; height: 58px; border-radius: 18px;
+            background: var(--amber); color: #0a0e1a;
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+            transition: all 0.2s; animation: pulse-ring 2.5s infinite;
+        }
+        .cart-fab:hover { transform: scale(1.08); }
+        .cart-fab.bounce { animation: cartBounce 0.4s ease; }
+        .cart-badge {
+            position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px;
+            background: #ef4444; color: white; font-size: 11px; font-weight: 700;
+            border-radius: 11px; display: none; align-items: center; justify-content: center;
+            padding: 0 5px; border: 2px solid var(--bg-base);
+        }
+        .cart-badge.visible { display: flex; }
+
+        .cart-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .cart-overlay.open { opacity: 1; visibility: visible; }
+        .cart-sidebar {
+            position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+            width: 380px; max-width: 95vw; background: var(--bg-surface);
+            border-left: 1px solid var(--border); transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column;
+        }
+        .cart-sidebar.open { transform: translateX(0); }
+        .cart-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .cart-body { flex: 1; overflow-y: auto; padding: 16px; }
+        .cart-item { display: flex; gap: 10px; align-items: center; padding: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; animation: slideDown .25s ease; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-surface); color: #cbd5e1; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+        .qty-btn:hover { background: var(--amber); color: #0a0e1a; border-color: var(--amber); }
+        .cart-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+
+        .modal-overlay { position: fixed; inset: 0; z-index: 250; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s; padding: 16px; }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 22px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s; animation: popIn 0.3s ease; }
+        .modal-overlay.open .modal-box { transform: scale(1); }
+
+        .form-input { width: 100%; padding: 11px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 11px; color: #e2e8f0; font-size: 13px; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; outline: none; }
+        .form-input:focus { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 0 3px var(--amber-glow); }
+        .form-input::placeholder { color: #475569; }
+        textarea.form-input { resize: vertical; min-height: 80px; }
+
+        .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; background: var(--amber); color: #0a0e1a; font-weight: 700; border-radius: 13px; cursor: pointer; border: none; font-family: 'Syne', sans-serif; font-size: 13px; transition: all 0.2s; }
+        .btn-primary:hover { background: var(--amber-dark); transform: translateY(-1px); }
+        .btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 22px; background: transparent; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; font-weight: 600; border-radius: 13px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .btn-outline:hover { border-color: var(--amber); color: var(--amber); }
+        .wa-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 22px; background: #22c55e; color: white; font-weight: 700; border-radius: 13px; cursor: pointer; border: none; width: 100%; font-size: 14px; font-family: 'Syne', sans-serif; transition: all 0.2s; }
+        .wa-btn:hover { background: #16a34a; transform: translateY(-1px); }
+
+        .label-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.15); padding: 4px 12px; border-radius: 20px; }
+
+        .badge-hot { background: linear-gradient(135deg,#f59e0b,#ef4444); color: white; font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 5px; letter-spacing: 0.06em; text-transform: uppercase; }
+        .badge-rec { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+        .badge-new { background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+
+        .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .chip-open { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+        .chip-closed { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+
+        .toast-container { position: fixed; top: 80px; right: 16px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+        .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); animation: toastIn .3s ease; min-width: 220px; max-width: 90vw; }
+
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.55s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        .lightbox { position: fixed; inset: 0; z-index: 400; background: rgba(0,0,0,0.93); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all .3s; padding: 16px; }
+        .lightbox.open { opacity: 1; visibility: visible; }
+        .lightbox img { max-width: 90vw; max-height: 85vh; border-radius: 14px; object-fit: contain; }
+
+        .gallery-item { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--border); cursor: pointer; }
+        .gallery-item img { width: 100%; height: 200px; object-fit: cover; transition: transform .5s ease; display: block; }
+        .gallery-item:hover img { transform: scale(1.07); }
+        .gallery-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .3s; }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+        .search-box { position: relative; }
+        .search-box input { padding-left: 40px; }
+        .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 14px; }
+
+        .filter-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .filter-scroll::-webkit-scrollbar { display: none; }
+
+        .step-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: all .3s; }
+        .step-dot.active { background: var(--amber); width: 22px; border-radius: 5px; }
+
+        .star-rating { display: flex; gap: 4px; }
+        .star { font-size: 24px; cursor: pointer; color: #334155; transition: color .15s, transform .15s; }
+        .star:hover, .star.active { color: var(--amber); transform: scale(1.2); }
+
+        .review-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+
+        .map-frame { filter: invert(0.9) hue-rotate(190deg) saturate(0.7) brightness(0.9); }
+
+        .divider { border: none; border-top: 1px solid var(--border); }
+
+        .checkmark-path { stroke-dasharray: 100; stroke-dashoffset: 100; }
+        .success-state .checkmark-path { animation: checkmark .5s ease .2s both; }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 20px; text-align: center; gap: 10px; }
+
+        .bg-mesh { background-image: radial-gradient(ellipse at 20% 50%, rgba(245,158,11,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(249,115,22,0.03) 0%, transparent 40%); }
+
+        .floating-search { position: sticky; top: 0; z-index: 10; background: var(--bg-base); padding: 12px 0 8px; }
+
+        .order-type-btn { padding: 12px; border-radius: 11px; border: 1px solid var(--border); background: var(--bg-card); color: #94a3b8; font-weight: 600; font-size: 13px; cursor: pointer; transition: all .2s; }
+
+        .coupon-wrap { display: flex; gap: 8px; }
+        .coupon-apply { padding: 11px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--amber); font-weight: 700; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all .2s; }
+        .coupon-apply:hover { background: var(--amber); color: #0a0e1a; }
+
+        .sync-badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#64748b; }
+        .sync-dot { width:6px; height:6px; border-radius:50%; background:#475569; }
+        .sync-dot.ok { background:#4ade80; box-shadow:0 0 0 3px rgba(74,222,128,.15); }
+        .sync-dot.fail { background:#f87171; box-shadow:0 0 0 3px rgba(248,113,113,.15); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .nav-cta { display: none; }
+            .hero-h1 { font-size: 2.2rem !important; }
+            .hero-stats { gap: 14px !important; }
+            .hero-stat-divider { display: none !important; }
+            .about-grid { grid-template-columns: 1fr !important; }
+            .about-imgs { display: none; }
+            .contact-grid { grid-template-columns: 1fr !important; }
+            .gallery-grid { grid-template-columns: 1fr 1fr !important; }
+            .gallery-item:nth-child(5) { grid-column: span 2 !important; }
+            .cart-sidebar { width: 100vw; }
+            .hero-cards { display: none !important; }
+            .hero-bottom { flex-direction: column !important; gap: 10px !important; align-items: flex-start !important; }
+            .menu-grid { grid-template-columns: 1fr !important; }
+            .review-grid { grid-template-columns: 1fr !important; }
+            .rating-summary-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+            .hero-h1 { font-size: 1.9rem !important; }
+            .hero-btns { flex-direction: column; }
+            .hero-btns button, .hero-btns a { width: 100% !important; }
+            .gallery-grid { grid-template-columns: 1fr !important; }
+            .gallery-item:nth-child(5) { grid-column: span 1 !important; }
+        }
+    </style>
 </head>
 <body>
-<div id="scrim"></div>
-<aside class="side" id="side" aria-label="Navigasi utama">
-  <div class="brand">
-    <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 21h14M6 7h12M6 7l-3 7a3 3 0 006 0zM18 7l-3 7a3 3 0 006 0z"/></svg></div>
-    <div><b>Legal Command Center</b><span>Legal &amp; Compliance</span></div>
-  </div>
-  <nav id="nav"></nav>
-  <div class="sfoot"><b>Tim Legal</b>Sumber data: file Excel Task Tracker. Halaman ini hanya membaca, ubah data di Excel.</div>
-</aside>
-<div class="main">
-  <header class="top">
-    <button id="menu" aria-label="Buka menu"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
-    <div><h1 id="ttl">Ringkasan</h1><p id="stl"></p></div>
-    <div class="asof" id="asof"></div>
-  </header>
-  <main id="view" tabindex="-1"></main>
-</div>
-<script>
-const D={"today": "2026-09-30", "main": [{"id": 1, "row": 2, "title": "Pengajuan Pembuatan T SHIRT Polda Jabar", "bu": "Others", "p": "P3", "dv": "ESG", "dp": "Conservation & Environment Protection", "cat": "Corporate Governance", "st": "Completed", "sd": "2026-05-15", "ed": "2026-05-20", "dur": 5, "age": null, "note": ""}, {"id": 2, "row": 3, "title": "Somasi RTH tanah Trinity", "bu": "Others", "p": "P1", "dv": "Horeca", "dp": "FB", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-05-18", "ed": "2026-05-20", "dur": 2, "age": null, "note": ""}, {"id": 3, "row": 4, "title": "Penandatanganan perubahan kegiatan Usaha SBU", "bu": "PT 72425", "p": "P1", "dv": "Marketing", "dp": "Brand", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-05-28", "ed": "2026-06-10", "dur": 13, "age": null, "note": ""}, {"id": 4, "row": 5, "title": "Kasus TPPU", "bu": "PT Eigerindo MPI", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-05-18", "ed": "2026-05-19", "dur": 1, "age": null, "note": ""}, {"id": 5, "row": 6, "title": "Peralihan PT Supplier PT KIND", "bu": "PT KIND", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Corporate Governance", "st": "Completed", "sd": "2026-05-18", "ed": "2026-05-19", "dur": 1, "age": null, "note": ""}, {"id": 6, "row": 7, "title": "Pengurusan ruko Semarang PT 23", "bu": "PT Dua Puluh Tiga", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-05-26", "ed": "2026-05-28", "dur": 2, "age": null, "note": ""}, {"id": 7, "row": 8, "title": "Resume terkait kejelasan pembagian Fungsi PT KIND", "bu": "PT 72425", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Corporate Governance", "st": "Completed", "sd": "2026-05-28", "ed": "2026-05-28", "dur": 0, "age": null, "note": ""}, {"id": 8, "row": 9, "title": "Wanprestasi Supplier PT 23", "bu": "PT Dua Puluh Tiga", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-05-26", "ed": "2026-05-28", "dur": 2, "age": null, "note": ""}, {"id": 9, "row": 10, "title": "Pengurusan Piutang B2B PT 23", "bu": "PT Dua Puluh Tiga", "p": "P1", "dv": "Operation", "dp": "", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-05-13", "ed": "2026-05-18", "dur": 5, "age": null, "note": ""}, {"id": 10, "row": 11, "title": "Penyalahgunaan Dana Pajak dan Piutang SAMUDRA", "bu": "PT KIND", "p": "P1", "dv": "ICT", "dp": "", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-05-25", "ed": "2026-05-28", "dur": 3, "age": null, "note": ""}, {"id": 11, "row": 12, "title": "Pengurusan Tanah Sragen", "bu": "PT Eksonindo MPI", "p": "P2", "dv": "ESG", "dp": "ESG Performance", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-05-26", "ed": "2026-06-12", "dur": 17, "age": null, "note": ""}, {"id": 12, "row": 13, "title": "Penjelasan terkait Sertipikat HALAL", "bu": "PT KIND", "p": "P2", "dv": "Corporate Strategy", "dp": "Strategy & Planning", "cat": "Contract Management", "st": "Completed", "sd": null, "ed": null, "dur": null, "age": null, "note": ""}, {"id": 13, "row": 14, "title": "PKS KIND dengan EMPI", "bu": "PT Eksonindo MPI", "p": "P0", "dv": "Corporate Strategy", "dp": "Strategy & Planning", "cat": "Contract Management", "st": "Completed", "sd": "2026-05-28", "ed": "2026-06-24", "dur": 27, "age": null, "note": ""}, {"id": 14, "row": 15, "title": "PKS PT 23 dengan Eksonindo", "bu": "PT Dua Puluh Tiga", "p": "P1", "dv": "HCGA", "dp": "General HCGA", "cat": "Surat Keluar", "st": "Completed", "sd": "2026-05-28", "ed": "2026-05-29", "dur": 1, "age": null, "note": ""}, {"id": 15, "row": 16, "title": "Penanganan Kasus Kehilangan EAS SUMATRA", "bu": "PT Eigerindo MPI", "p": "P1", "dv": "Marketing", "dp": "Digital", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-06-02", "ed": "2026-06-03", "dur": 1, "age": null, "note": ""}, {"id": 16, "row": 17, "title": "BPOM Pembuatan Parfum", "bu": "PT KIND", "p": "P1", "dv": "Marketing", "dp": "Digital", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-06-02", "ed": "2026-06-02", "dur": 0, "age": null, "note": ""}, {"id": 17, "row": 18, "title": "Pembuatan Form FCCA untuk Supllier", "bu": "PT KIND", "p": "P2", "dv": "ICT", "dp": "", "cat": "Risk Management", "st": "Completed", "sd": "2026-05-28", "ed": "2026-06-02", "dur": 5, "age": null, "note": ""}, {"id": 18, "row": 19, "title": "Penyelesaian sengketa hukum Vendor CSJ di Polda Jabar", "bu": "PT KIND", "p": "P2", "dv": "ICT", "dp": "", "cat": "Litigation & Dispute Resolution", "st": "Completed", "sd": "2026-05-28", "ed": "2026-06-02", "dur": 5, "age": null, "note": ""}, {"id": 19, "row": 20, "title": "Penyelesaian kasus sexsual Harrasement", "bu": "PT Eigerindo MPI", "p": "P1", "dv": "Corporate Strategy", "dp": "Legal & Compliance", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-06-03", "ed": "2026-06-03", "dur": 0, "age": null, "note": ""}, {"id": 20, "row": 21, "title": "Penyelesaian kasus Asuransi", "bu": "PT Eigerindo MPI", "p": "P1", "dv": "F&A", "dp": "Finance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-05", "ed": null, "dur": null, "age": null, "note": ""}, {"id": 21, "row": 22, "title": "Jual Beli Store Radio Dalam", "bu": "PT Eigerindo MPI", "p": "P1", "dv": "Marketing", "dp": "Digital", "cat": "Asset", "st": "In progress", "sd": "2026-06-08", "ed": "2026-06-09", "dur": 1, "age": 114, "note": ""}, {"id": 22, "row": 23, "title": "Pembuatan langkah Do and Don’t terkait music di materi Promosi", "bu": "PT 72425", "p": "P1", "dv": "Marketing", "dp": "", "cat": "Risk Management", "st": "In progress", "sd": "2026-06-08", "ed": "2026-06-09", "dur": 1, "age": 114, "note": ""}, {"id": 23, "row": 24, "title": "Penyelesaian Administrasi CSR Bogor", "bu": "PT EEN", "p": "P1", "dv": "HCGA", "dp": "HCBP", "cat": "Compliance & Regulatory / Affairs", "st": "In progress", "sd": "2026-09-05", "ed": "2026-09-30", "dur": 25, "age": 25, "note": "Menunggu Draft yang dibikin oleh Pemkab terkait CSR / Hibah helikopter"}, {"id": 24, "row": 25, "title": "", "bu": "", "p": "P1", "dv": "HCGA", "dp": "HCBP", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-08", "ed": "2026-06-15", "dur": 7, "age": null, "note": ""}, {"id": 25, "row": 26, "title": "", "bu": "", "p": "P0", "dv": "Corporate Strategy", "dp": "Legal & Compliance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-05", "ed": null, "dur": null, "age": null, "note": ""}, {"id": 26, "row": 27, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-06-08", "ed": "2026-06-09", "dur": 1, "age": null, "note": ""}, {"id": 27, "row": 28, "title": "", "bu": "", "p": "P1", "dv": "HCGA", "dp": "HCBP", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-08", "ed": "2026-06-09", "dur": 1, "age": null, "note": ""}, {"id": 28, "row": 29, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "Landscape", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-06-12", "ed": "2026-06-12", "dur": 0, "age": null, "note": ""}, {"id": 29, "row": 30, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-12", "ed": null, "dur": null, "age": null, "note": ""}, {"id": 30, "row": 31, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-14", "ed": "2026-06-14", "dur": 0, "age": null, "note": ""}, {"id": 31, "row": 32, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-14", "ed": "2026-06-14", "dur": 0, "age": null, "note": ""}, {"id": 32, "row": 33, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-14", "ed": "2026-06-14", "dur": 0, "age": null, "note": ""}, {"id": 33, "row": 34, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-14", "ed": "2026-06-14", "dur": 0, "age": null, "note": ""}, {"id": 34, "row": 35, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-14", "ed": "2026-06-14", "dur": 0, "age": null, "note": ""}, {"id": 35, "row": 36, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-14", "ed": "2026-06-14", "dur": 0, "age": null, "note": ""}, {"id": 36, "row": 37, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-14", "ed": "2026-06-14", "dur": 0, "age": null, "note": ""}, {"id": 37, "row": 38, "title": "", "bu": "", "p": "P3", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-17", "ed": "2026-06-17", "dur": 0, "age": null, "note": ""}, {"id": 38, "row": 39, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-17", "ed": "2026-06-30", "dur": 13, "age": null, "note": ""}, {"id": 39, "row": 40, "title": "", "bu": "", "p": "P0", "dv": "Operation", "dp": "Attraction", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-18", "ed": "2026-06-19", "dur": 1, "age": null, "note": ""}, {"id": 40, "row": 41, "title": "", "bu": "", "p": "P0", "dv": "Operation", "dp": "Attraction", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-18", "ed": "2026-06-19", "dur": 1, "age": null, "note": ""}, {"id": 41, "row": 42, "title": "", "bu": "", "p": "P0", "dv": "HCGA", "dp": "General HCGA", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-19", "ed": "2026-06-22", "dur": 3, "age": null, "note": ""}, {"id": 42, "row": 43, "title": "", "bu": "", "p": "P0", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-15", "ed": "2026-07-22", "dur": 37, "age": null, "note": ""}, {"id": 43, "row": 44, "title": "", "bu": "", "p": "P0", "dv": "HCGA", "dp": "General HCGA", "cat": "Contract Management", "st": "In progress", "sd": "2026-06-22", "ed": null, "dur": null, "age": 100, "note": ""}, {"id": 44, "row": 45, "title": "", "bu": "", "p": "P1", "dv": "HCGA", "dp": "General HCGA", "cat": "Contract Management", "st": "In progress", "sd": "2026-06-23", "ed": null, "dur": null, "age": 99, "note": ""}, {"id": 45, "row": 46, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-22", "ed": "2026-06-25", "dur": 3, "age": null, "note": ""}, {"id": 46, "row": 47, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-23", "ed": "2026-06-23", "dur": 0, "age": null, "note": ""}, {"id": 47, "row": 48, "title": "", "bu": "", "p": "P1", "dv": "HCGA", "dp": "General HCGA", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-22", "ed": "2026-06-26", "dur": 4, "age": null, "note": ""}, {"id": 48, "row": 49, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-24", "ed": "2026-06-24", "dur": 0, "age": null, "note": ""}, {"id": 49, "row": 50, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-24", "ed": "2026-06-24", "dur": 0, "age": null, "note": ""}, {"id": 50, "row": 51, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-24", "ed": "2026-06-24", "dur": 0, "age": null, "note": ""}, {"id": 51, "row": 52, "title": "", "bu": "", "p": "P1", "dv": "Operation", "dp": "Traffic & Ticketing", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-25", "ed": "2026-06-29", "dur": 4, "age": null, "note": ""}, {"id": 52, "row": 53, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-06-29", "ed": "2026-06-29", "dur": 0, "age": null, "note": ""}, {"id": 53, "row": 54, "title": "", "bu": "", "p": "P0", "dv": "Corporate Strategy", "dp": "ESG Performance", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-06-29", "ed": "2026-06-30", "dur": 1, "age": null, "note": ""}, {"id": 54, "row": 55, "title": "", "bu": "", "p": "P1", "dv": "Operation", "dp": "General Ops", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-29", "ed": "2026-07-01", "dur": 2, "age": null, "note": ""}, {"id": 55, "row": 56, "title": "", "bu": "", "p": "P2", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-06-30", "ed": "2026-07-01", "dur": 1, "age": null, "note": ""}, {"id": 56, "row": 57, "title": "", "bu": "", "p": "P2", "dv": "Marketing", "dp": "Digital", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-06-29", "ed": "2026-06-30", "dur": 1, "age": null, "note": ""}, {"id": 57, "row": 58, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-01", "ed": "2026-07-01", "dur": 0, "age": null, "note": ""}, {"id": 58, "row": 59, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-01", "ed": "2026-07-01", "dur": 0, "age": null, "note": ""}, {"id": 59, "row": 60, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-01", "ed": "2026-07-03", "dur": 2, "age": 91, "note": ""}, {"id": 60, "row": 61, "title": "", "bu": "", "p": "P1", "dv": "Horeca", "dp": "FB", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-03", "ed": "2026-07-16", "dur": 13, "age": null, "note": ""}, {"id": 61, "row": 62, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-06", "ed": "2026-07-08", "dur": 2, "age": null, "note": ""}, {"id": 62, "row": 63, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-07", "ed": "2026-07-08", "dur": 1, "age": null, "note": ""}, {"id": 63, "row": 64, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 64, "row": 65, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 65, "row": 66, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 66, "row": 67, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-07", "ed": "2026-07-10", "dur": 3, "age": 85, "note": ""}, {"id": 67, "row": 68, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-09", "ed": "2026-07-09", "dur": 0, "age": null, "note": ""}, {"id": 68, "row": 69, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-09", "ed": "2026-07-09", "dur": 0, "age": null, "note": ""}, {"id": 69, "row": 70, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 70, "row": 71, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 71, "row": 72, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 72, "row": 73, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 73, "row": 74, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 74, "row": 75, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-10", "dur": 1, "age": 83, "note": ""}, {"id": 75, "row": 76, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-09", "ed": "2026-07-14", "dur": 5, "age": 83, "note": ""}, {"id": 76, "row": 77, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": null, "ed": null, "dur": null, "age": null, "note": ""}, {"id": 77, "row": 78, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": null, "ed": null, "dur": null, "age": null, "note": ""}, {"id": 78, "row": 79, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "PR & Comm", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-13", "ed": "2026-07-13", "dur": 0, "age": null, "note": ""}, {"id": 79, "row": 80, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-13", "ed": "2026-07-13", "dur": 0, "age": null, "note": ""}, {"id": 80, "row": 81, "title": "", "bu": "", "p": "P1", "dv": "HCGA", "dp": "L&D", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-10", "ed": "2026-07-13", "dur": 3, "age": null, "note": ""}, {"id": 81, "row": 82, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-13", "ed": "2026-07-14", "dur": 1, "age": 79, "note": ""}, {"id": 82, "row": 83, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-13", "ed": "2026-07-14", "dur": 1, "age": 79, "note": ""}, {"id": 83, "row": 84, "title": "", "bu": "", "p": "P1", "dv": "HCGA", "dp": "General HCGA", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-14", "ed": "2026-07-14", "dur": 0, "age": null, "note": ""}, {"id": 84, "row": 85, "title": "", "bu": "", "p": "P1", "dv": "Eiger Camp", "dp": "", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-13", "ed": "2026-07-13", "dur": 0, "age": null, "note": ""}, {"id": 85, "row": 86, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-14", "ed": "2026-07-20", "dur": 6, "age": null, "note": ""}, {"id": 86, "row": 87, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-15", "ed": "2026-07-16", "dur": 1, "age": null, "note": ""}, {"id": 87, "row": 88, "title": "", "bu": "", "p": "P1", "dv": "Operation", "dp": "Engineering", "cat": "Surat Keluar", "st": "Completed", "sd": "2026-07-16", "ed": "2026-07-16", "dur": 0, "age": null, "note": ""}, {"id": 88, "row": 89, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Surat Keluar", "st": "Completed", "sd": "2026-07-16", "ed": "2026-07-16", "dur": 0, "age": null, "note": ""}, {"id": 89, "row": 90, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 90, "row": 91, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 91, "row": 92, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 92, "row": 93, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 93, "row": 94, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 94, "row": 95, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 95, "row": 96, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 96, "row": 97, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 97, "row": 98, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-16", "ed": "2026-07-21", "dur": 5, "age": 76, "note": ""}, {"id": 98, "row": 99, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-20", "ed": "2026-07-20", "dur": 0, "age": null, "note": ""}, {"id": 99, "row": 100, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-20", "ed": "2026-07-20", "dur": 0, "age": null, "note": ""}, {"id": 100, "row": 101, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-20", "ed": "2026-07-20", "dur": 0, "age": null, "note": ""}, {"id": 101, "row": 102, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-20", "ed": "2026-07-21", "dur": 1, "age": null, "note": ""}, {"id": 102, "row": 103, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-20", "ed": "2026-07-21", "dur": 1, "age": null, "note": ""}, {"id": 103, "row": 104, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-20", "ed": "2026-07-23", "dur": 3, "age": null, "note": ""}, {"id": 104, "row": 105, "title": "", "bu": "", "p": "P1", "dv": "HCGA", "dp": "General HCGA", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-15", "ed": "2026-07-20", "dur": 5, "age": null, "note": ""}, {"id": 105, "row": 106, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-20", "ed": "2026-07-21", "dur": 1, "age": 72, "note": ""}, {"id": 106, "row": 107, "title": "", "bu": "", "p": "P1", "dv": "Operation", "dp": "Traffic & Ticketing", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-21", "ed": "2026-07-21", "dur": 0, "age": null, "note": ""}, {"id": 107, "row": 108, "title": "", "bu": "", "p": "P1", "dv": "31011", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-21", "ed": "2026-07-21", "dur": 0, "age": 71, "note": ""}, {"id": 108, "row": 109, "title": "", "bu": "", "p": "P0", "dv": "Corporate Strategy", "dp": "Legal & Compliance", "cat": "Corporate Governance", "st": "Completed", "sd": "2026-07-22", "ed": "2026-07-22", "dur": 0, "age": null, "note": ""}, {"id": 109, "row": 110, "title": "", "bu": "", "p": "P0", "dv": "Corporate Strategy", "dp": "Legal & Compliance", "cat": "Corporate Governance", "st": "Completed", "sd": "2026-07-21", "ed": "2026-07-21", "dur": 0, "age": null, "note": ""}, {"id": 110, "row": 111, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-23", "ed": "2026-07-24", "dur": 1, "age": null, "note": ""}, {"id": 111, "row": 112, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-24", "ed": "2026-07-24", "dur": 0, "age": null, "note": ""}, {"id": 112, "row": 113, "title": "", "bu": "", "p": "P1", "dv": "ICT", "dp": "Digital", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-24", "ed": "2026-07-27", "dur": 3, "age": null, "note": ""}, {"id": 113, "row": 114, "title": "", "bu": "", "p": "P1", "dv": "Operation", "dp": "Engineering", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-24", "ed": "2026-07-27", "dur": 3, "age": null, "note": ""}, {"id": 114, "row": 115, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-27", "ed": "2026-07-28", "dur": 1, "age": null, "note": ""}, {"id": 115, "row": 116, "title": "", "bu": "", "p": "P1", "dv": "Horeca", "dp": "", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-24", "ed": "2026-08-13", "dur": 20, "age": null, "note": ""}, {"id": 116, "row": 117, "title": "", "bu": "", "p": "P1", "dv": "Horeca", "dp": "Legal & Compliance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-28", "ed": "2026-07-28", "dur": 0, "age": null, "note": ""}, {"id": 117, "row": 118, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-29", "ed": "2026-07-29", "dur": 0, "age": null, "note": ""}, {"id": 118, "row": 119, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Legal & Compliance", "cat": "Compliance & Regulatory / Affairs", "st": "Completed", "sd": "2026-07-30", "ed": "2026-07-31", "dur": 1, "age": null, "note": ""}, {"id": 119, "row": 120, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-28", "ed": "2026-07-30", "dur": 2, "age": null, "note": ""}, {"id": 120, "row": 121, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-31", "ed": "2026-07-31", "dur": 0, "age": null, "note": ""}, {"id": 121, "row": 122, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-07-31", "ed": "2026-07-31", "dur": 0, "age": null, "note": ""}, {"id": 122, "row": 123, "title": "", "bu": "", "p": "P1", "dv": "Corporate Strategy", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-31", "ed": "2026-08-03", "dur": 3, "age": 61, "note": ""}, {"id": 123, "row": 124, "title": "", "bu": "", "p": "P1", "dv": "Corporate Strategy", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-31", "ed": "2026-08-03", "dur": 3, "age": 61, "note": ""}, {"id": 124, "row": 125, "title": "", "bu": "", "p": "P1", "dv": "Corporate Strategy", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-31", "ed": "2026-08-03", "dur": 3, "age": 61, "note": ""}, {"id": 125, "row": 126, "title": "", "bu": "", "p": "P1", "dv": "Corporate Strategy", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-31", "ed": "2026-08-03", "dur": 3, "age": 61, "note": ""}, {"id": 126, "row": 127, "title": "", "bu": "", "p": "P1", "dv": "Corporate Strategy", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-31", "ed": "2026-08-03", "dur": 3, "age": 61, "note": ""}, {"id": 127, "row": 128, "title": "", "bu": "", "p": "P1", "dv": "Corporate Strategy", "dp": "", "cat": "Contract Management", "st": "Blocked", "sd": "2026-07-31", "ed": "2026-08-03", "dur": 3, "age": 61, "note": ""}, {"id": 128, "row": 129, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-05", "ed": "2026-08-07", "dur": 2, "age": null, "note": ""}, {"id": 129, "row": 130, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-05", "ed": "2026-08-05", "dur": 0, "age": null, "note": ""}, {"id": 130, "row": 131, "title": "", "bu": "", "p": "P1", "dv": "Operation", "dp": "Engineering", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-07", "ed": "2026-08-10", "dur": 3, "age": null, "note": ""}, {"id": 131, "row": 132, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-10", "ed": "2026-08-11", "dur": 1, "age": null, "note": ""}, {"id": 132, "row": 133, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-10", "ed": "2026-08-11", "dur": 1, "age": null, "note": ""}, {"id": 133, "row": 134, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-10", "ed": "2026-08-11", "dur": 1, "age": null, "note": ""}, {"id": 134, "row": 135, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-10", "ed": "2026-08-11", "dur": 1, "age": null, "note": ""}, {"id": 135, "row": 136, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-10", "ed": "2026-08-11", "dur": 1, "age": null, "note": ""}, {"id": 136, "row": 137, "title": "", "bu": "", "p": "P1", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-10", "ed": "2026-08-11", "dur": 1, "age": null, "note": ""}, {"id": 137, "row": 138, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-11", "ed": "2026-08-12", "dur": 1, "age": null, "note": ""}, {"id": 138, "row": 139, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-12", "ed": "2026-08-13", "dur": 1, "age": null, "note": ""}, {"id": 139, "row": 140, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Creative", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-11", "ed": "2026-08-13", "dur": 2, "age": null, "note": ""}, {"id": 140, "row": 141, "title": "", "bu": "", "p": "P1", "dv": "Marketing", "dp": "Offline Partnership", "cat": "Contract Management", "st": "Completed", "sd": "2026-08-12", "ed": "2026-08-14", "dur": 2, "age": null, "note": ""}], "proj": [{"project": "Perizinan Gereja Kupang", "sub": "Penyedian Dokumen Pendukung Perizinan Gereja", "p": "P3", "st": "Completed", "sd": "2026-05-15", "ed": "2026-05-20", "dur": 5, "note": "", "pi": "", "ca": ""}, {"project": "Perizinan Gereja Kupang", "sub": "Dokumen PERTEK", "p": "P1", "st": "Completed", "sd": "2026-05-18", "ed": "2026-05-20", "dur": 2, "note": "", "pi": "", "ca": ""}, {"project": "Perizinan Gereja Kupang", "sub": "Koordinasi PUPR dan Tata Ruang", "p": "P1", "st": "Completed", "sd": "2026-05-28", "ed": "2026-06-10", "dur": 13, "note": "", "pi": "", "ca": ""}, {"project": "Perizinan Gereja Kupang", "sub": "Koordinasi Front Kerukunan Umat Beragama (Pengumpulan 100 KTP)", "p": "P1", "st": "Completed", "sd": "2026-05-18", "ed": "2026-05-19", "dur": 1, "note": "", "pi": "", "ca": ""}, {"project": "Perizinan Gereja Kupang", "sub": "Dokumen Persyaratan PBG", "p": "P1", "st": "In progress", "sd": "2026-07-01", "ed": "2028-08-31", "dur": 792, "note": "Masih terdapat dokumen yang tidak memenuhi persayaratan terkait Sertipikat Ahli yang sudah habis masa berlakunya dan belum di perpanjang", "pi": "Dari pihak kontraktror terkendala masalah perpanjangan sertipikat ahli", "ca": "Melakukan koordinasi dengan pihak PTSP untuk keringanan terkait sertipikat ahli cukup hanya nomor register perpanjangan nya saja"}, {"project": "Perizinan Gereja Kupang", "sub": "Dokumen PBG Terbit", "p": "P1", "st": "Not started", "sd": "2026-09-15", "ed": "2026-09-30", "dur": 15, "note": "", "pi": "", "ca": ""}, {"project": "Pembongkaran SUTET PLN Setiabudhi", "sub": "Persetujuan Kantor Daerah", "p": "P1", "st": "Completed", "sd": "2026-05-26", "ed": "2026-05-28", "dur": 2, "note": "", "pi": "", "ca": ""}, {"project": "Pembongkaran SUTET PLN Setiabudhi", "sub": "Persetujuan Kantor Pusat", "p": "P1", "st": "Completed", "sd": "2026-05-13", "ed": "2026-05-18", "dur": 5, "note": "", "pi": "", "ca": ""}, {"project": "Pembongkaran SUTET PLN Setiabudhi", "sub": "Penunjukan Konsultan Pembongkaran", "p": "P2", "st": "Completed", "sd": "2026-05-26", "ed": "2026-06-12", "dur": 17, "note": "", "pi": "", "ca": ""}, {"project": "Pembongkaran SUTET PLN Setiabudhi", "sub": "Persetujuan Dokumen Izin Prinsip : - Dokumen Analisa Resiko - Pelepasan Konduktor - Pembongkaran Tower", "p": "P1", "st": "In progress", "sd": "2026-08-01", "ed": "2026-09-30", "dur": 60, "note": "Terkendala masalah sertipikat alas hak SUTET yang belum di proses di BPN", "pi": "Dari Pihak BPN meminta untuk proses sertipikasi lewat sistem OSS namun dari PLN keberatan, dikarenakan terkait tanah BUMN yang diperoleh sebelum 2021 dapat memakai PERTEK", "ca": "Memfasilitasi pertemuan pihak PLN dengan Kepala Kantor BPN Kota untuk mencari alternatif terbaik bagi kedua belah pihak"}, {"project": "Penertiban RTH Tanah Trinity", "sub": "Pembuatan Somasi", "p": "P2", "st": "Completed", "sd": null, "ed": null, "dur": null, "note": "", "pi": "", "ca": ""}, {"project": "Penertiban RTH Tanah Trinity", "sub": "Sosialisasi dan Komunikasi", "p": "", "st": "Completed", "sd": null, "ed": null, "dur": null, "note": "", "pi": "", "ca": ""}, {"project": "Penertiban RTH Tanah Trinity", "sub": "Pembongkaran", "p": "P1", "st": "Completed", "sd": "2026-05-28", "ed": "2026-05-29", "dur": 1, "note": "", "pi": "", "ca": ""}, {"project": "Pembelian tanah Radio Dalam", "sub": "Kelengkapan Dokumen", "p": "P1", "st": "Completed", "sd": "2026-09-02", "ed": "2026-09-17", "dur": 15, "note": "", "pi": "", "ca": ""}, {"project": "Pembelian tanah Radio Dalam", "sub": "Penawaran Biaya Notaris", "p": "P2", "st": "In progress", "sd": "2026-09-15", "ed": "2026-09-23", "dur": 8, "note": "21 Sep 26 : Masih menunggu kabar dari danamon", "pi": "", "ca": ""}, {"project": "Pembelian tanah Radio Dalam", "sub": "PPJB", "p": "P2", "st": "Not started", "sd": "2026-09-29", "ed": "2026-09-29", "dur": 0, "note": "", "pi": "", "ca": ""}, {"project": "Pembelian tanah Radio Dalam", "sub": "Pelepasan Hak", "p": "P1", "st": "Not started", "sd": null, "ed": null, "dur": null, "note": "", "pi": "", "ca": ""}, {"project": "Pembelian tanah Radio Dalam", "sub": "Permohonan Sertipikasi", "p": "P1", "st": "Not started", "sd": null, "ed": null, "dur": null, "note": "", "pi": "", "ca": ""}, {"project": "Pembelian tanah Radio Dalam", "sub": "Sertipikat balik nama", "p": "P1", "st": "Not started", "sd": null, "ed": null, "dur": null, "note": "", "pi": "", "ca": ""}], "docs": [{"id": 1, "name": "DELH", "dv": "ESG", "dp": "ESG Performance", "cat": "Compliance & Regulatory / Affairs", "inst": "DELH", "sd": null, "ed": null, "left": null, "file": "", "st": "noend", "bad": false}, {"id": 2, "name": "NDA PT EEN X PT GREENPROSA ADIKARA NUSA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-05-21", "ed": "2025-05-21", "left": -497, "file": "019-NDA PT EEN X PT GREENPROSA ADIKARA NUSA.pdf", "st": "expired", "bad": false}, {"id": 3, "name": "PT EEN X PT Tukar Pikiran Sebaya", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-15", "ed": "2025-05-01", "left": -517, "file": "021-NDA PT EEN X PT Tukar Pikiran Sebaya.docx.pdf", "st": "expired", "bad": true}, {"id": 4, "name": "PT EEN X PT Dektos Digital Corbuzier", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-15", "ed": null, "left": null, "file": "022-NDA PT EEN X PT Dektos Digital Corbuzier.pdf", "st": "noend", "bad": false}, {"id": 5, "name": "PT EEN X Iskandar(MhSGeo)", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-15", "ed": null, "left": null, "file": "023-NDA PT EEN X Iskandar(MhSGeo).pdf", "st": "noend", "bad": false}, {"id": 6, "name": "PT EEn X Agnes Abigail", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-28", "ed": null, "left": null, "file": "024-NDA PT EEN X Agnes Abigail (WIUI).docx.pdf", "st": "noend", "bad": false}, {"id": 7, "name": "NDA PT EEN X Ruth Deasy Natalia (Info Bogor)", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-01", "ed": null, "left": null, "file": "025-NDA PT EEN X Ruth Deasy Natalia (Info Bogor).pdf", "st": "noend", "bad": false}, {"id": 8, "name": "NDA PT EEN X Muhammad Taufiq Rahman (Info Jawabarat)", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-01", "ed": null, "left": null, "file": "026-NDA PT EEN X Muhammad Taufiq Rahman (Info Jawabarat).pdf", "st": "noend", "bad": false}, {"id": 9, "name": "NDA PT EEN X Miftahul Khoer(Bogor Update)", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-01", "ed": null, "left": null, "file": "027-NDA PT EEN X Miftahul Khoer(Bogor Update).pdf", "st": "noend", "bad": false}, {"id": 10, "name": "NDA PT EEN X PT Tribun Berita Online", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-01", "ed": null, "left": null, "file": "028-NDA PT EEN X PT Tribun Berita Online.pdf", "st": "noend", "bad": false}, {"id": 11, "name": "NDA PT EEN X PT Genesis Garuda Asia", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-18", "ed": null, "left": null, "file": "029-NDA PT EEN X PT Genesis Garuda Asia.pdf", "st": "noend", "bad": false}, {"id": 12, "name": "NDA PT EEN X Khana Salsabila Wiguna (Bogorpisan)", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-01", "ed": null, "left": null, "file": "030-NDA PT EEN X Khana Salsabila Wiguna (Bogorpisan).pdf", "st": "noend", "bad": false}, {"id": 13, "name": "NDA PT EEN X PT Bogor Mediapolitan", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-01", "ed": null, "left": null, "file": "031-NDA PT EEN X PT Bogor Mediapolitan.pdf", "st": "noend", "bad": false}, {"id": 14, "name": "NDA PT EEN X PT Jaring Teguh Perkasa", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-03", "ed": null, "left": null, "file": "032-NDA PT EEN X PT Jaring Teguh Perkasa (Bogordaily).pdf", "st": "noend", "bad": false}, {"id": 15, "name": "NDA PT EEN X PT Trans Digital Media", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-29", "ed": null, "left": null, "file": "034-NDA PT EEN X PT Trans Digital Media (Detikcom).pdf", "st": "noend", "bad": false}, {"id": 16, "name": "NDA PT EEN X MELIA ZULIA EPENDI", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-01", "ed": null, "left": null, "file": "037-NDA PT EEN X MELIA ZULIA EPENDI.pdf", "st": "noend", "bad": false}, {"id": 17, "name": "NDA PT EEN X EGI PUTRA PRATAMA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-01", "ed": null, "left": null, "file": "038-NDA PT EEN X EGI PUTRA PRATAMA.pdf", "st": "noend", "bad": false}, {"id": 18, "name": "NDA PT EEN X PT Sebumi Berbagi Inspirasi", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-03", "ed": null, "left": null, "file": "039-NDA PT EEN X PT Sebumi Berbagi Inspirasi.pdf", "st": "noend", "bad": false}, {"id": 19, "name": "NDA PT EEN X PT TEKNOLOGI LINTAS NEGERI ABADI", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-09-01", "ed": null, "left": null, "file": "041-NDA PT EEN X PT TEKNOLOGI LINTAS NEGERI ABA.pdf", "st": "noend", "bad": false}, {"id": 20, "name": "NDA PT EEN X YAYASAN JEJAK ALAM NUSANTARA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-21", "ed": null, "left": null, "file": "044-NDA PT EEN X YAYASAN JEJAK ALAM NUSANTARA.pdf", "st": "noend", "bad": false}, {"id": 21, "name": "NDA PT EEN X PT MEDIA PUTRA NUSANTARA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-27", "ed": null, "left": null, "file": "046-NDA PT EEN X PT MEDIA PUTRA NUSANTARA.pdf", "st": "noend", "bad": false}, {"id": 22, "name": "NDA PT EEN X PT TIRTA ADI SURYA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-27", "ed": null, "left": null, "file": "047-NDA PT EEN X PT TIRTA ADI SURYA.pdf", "st": "noend", "bad": false}, {"id": 23, "name": "NDA PT EEN X PT BATA MERAH MEDIA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-30", "ed": null, "left": null, "file": "048-NDA PT EEN X PT BATA MERAH MEDIA.pdf", "st": "noend", "bad": false}, {"id": 24, "name": "NDA PT EEN X PT TRIBUN DIGITAL ONLINE", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-10-31", "ed": null, "left": null, "file": "049-NDA PT EEN X PT TRIBUN DIGITAL ONLINE.pdf", "st": "noend", "bad": false}, {"id": 25, "name": "NDA PT EEN X PT CAKRAWALA MEDIA USAHA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-11-10", "ed": null, "left": null, "file": "052-NDA PT EEN X PT CAKRAWALA MEDIA USAHA.pdf", "st": "noend", "bad": false}, {"id": 26, "name": "NDA PT EEN X PT NARASI CITRA SAHWAHITA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-11-10", "ed": null, "left": null, "file": "053-NDA PT EEN X PT NARASI CITRA SAHWAHITA.pdf", "st": "noend", "bad": false}, {"id": 27, "name": "NDA PT EEN X PT INFOMETRO MEDIATAMA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-11-10", "ed": null, "left": null, "file": "055-NDA PT EEN X PT INFOMETRO MEDIATAMA (NETGOE).pdf", "st": "noend", "bad": false}, {"id": 28, "name": "NDA PT EEN X PT BELINSKY KREASI STUDIO", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2026-03-30", "ed": null, "left": null, "file": "056-NDA PT EEN X PT BELINSKY KREASI STUDIO.pdf", "st": "noend", "bad": false}, {"id": 29, "name": "NDA PT EEN X PT VOSFOYER RUMAH KREASI", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2026-04-07", "ed": null, "left": null, "file": "057-NDA PT EEN X PT VOSFOYER RUMAH KREASI.pdf", "st": "noend", "bad": false}, {"id": 30, "name": "NDA_PT EEN X BOGOR24UPDATE", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-06", "ed": null, "left": null, "file": "NDA_PT EEN X BOGOR24UPDATE.pdf", "st": "noend", "bad": false}, {"id": 31, "name": "NDA_PT EEN X CV VAN MAJU JAYA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-06", "ed": null, "left": null, "file": "NDA_PT EEN X CV VAN MAJU JAYA.pdf", "st": "noend", "bad": false}, {"id": 32, "name": "NDA_PT EEN X FATHIAN HAFIZ", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-07-31", "ed": null, "left": null, "file": "NDA_PT EEN X FATHIAN HAFIZ.pdf", "st": "noend", "bad": false}, {"id": 33, "name": "NDA_PT EEN X GEO GENIUS", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-07-31", "ed": null, "left": null, "file": "NDA_PT EEN X GEO GENIUS.pdf", "st": "noend", "bad": false}, {"id": 34, "name": "NDA_PT EEN X INFO PUNCAK BOGOR", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-06", "ed": null, "left": null, "file": "NDA_PT EEN X INFO PUNCAK BOGOR.pdf", "st": "noend", "bad": false}, {"id": 35, "name": "NDA_PT EEN X KATA ALFA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-07-31", "ed": null, "left": null, "file": "NDA_PT EEN X KATA ALFA.pdf", "st": "noend", "bad": false}, {"id": 36, "name": "NDA_PT EEN X LANDUSE.ID", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-07-31", "ed": null, "left": null, "file": "NDA_PT EEN X LANDUSE.ID.pdf", "st": "noend", "bad": false}, {"id": 37, "name": "NDA_PT EEN X MATAYA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-14", "ed": null, "left": null, "file": "NDA_PT EEN X MATAYA.pdf", "st": "noend", "bad": false}, {"id": 38, "name": "NDA_PT EEN X PT BOGOR EKSPRESS MEDIA - Radar Bogor", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-06", "ed": null, "left": null, "file": "NDA_PT EEN X PT BOGOR EKSPRESS MEDIA - Radar Bogor.pdf", "st": "noend", "bad": false}, {"id": 39, "name": "NDA_PT EEN X PT POJOK SATU INDONESIA", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-06", "ed": null, "left": null, "file": "NDA_PT EEN X PT POJOK SATU INDONESIA.pdf", "st": "noend", "bad": false}, {"id": 40, "name": "NDA_YULIANI X JENNY", "dv": "Marketing", "dp": "Digital", "cat": "Contract Management", "inst": "Marketing", "sd": "2025-08-06", "ed": null, "left": null, "file": "NDA_YULIANI X JENNY.pdf", "st": "noend", "bad": false}, {"id": 41, "name": "Akta PT EEN", "dv": "Corporate Strategy", "dp": "Legal & Compliance", "cat": "Compliance & Regulatory / Affairs", "inst": "Legal", "sd": "2026-05-22", "ed": null, "left": null, "file": "Berkas EAL", "st": "noend", "bad": false}, {"id": 42, "name": "NIB PT EEN", "dv": "Corporate Strategy", "dp": "Legal & Compliance", "cat": "Compliance & Regulatory / Affairs", "inst": "Legal", "sd": "2026-05-22", "ed": null, "left": null, "file": "Berkas EAL", "st": "noend", "bad": false}, {"id": 43, "name": "NDA PT EEN - ALIF MUADZ MUHAMMAD", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "inst": "IPB", "sd": "2026-06-13", "ed": null, "left": null, "file": "Drafting NDA PT EEN - ALIF MUADZ MUHAMMAD-signed.pdf", "st": "noend", "bad": false}, {"id": 44, "name": "NDA PT EEN - ESTRINAYA SATYAKRIDA ROSDIANA", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "inst": "IPB", "sd": "2026-06-13", "ed": null, "left": null, "file": "Drafting NDA PT EEN - ESTRINAYA SATYAKRIDA ROSDIANA(1)-signed.pdf", "st": "noend", "bad": false}, {"id": 45, "name": "NDA PT EEN - FARIS MAKARIM", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "inst": "IPB", "sd": "2026-06-13", "ed": null, "left": null, "file": "Drafting NDA PT EEN - FARIS MAKARIM(1)-signed.pdf", "st": "noend", "bad": false}, {"id": 46, "name": "NDA PT EEN - ILHAM RAMADHAN", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "inst": "IPB", "sd": "2026-06-13", "ed": null, "left": null, "file": "Drafting NDA PT EEN - ILHAM RAMADHAN(1)-signed.pdf", "st": "noend", "bad": false}, {"id": 47, "name": "NDA PT EEN - MAYA AGATHA PUJI ARYANTY", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "inst": "IPB", "sd": "2026-06-13", "ed": null, "left": null, "file": "Drafting NDA PT EEN - MAYA AGATHA PUJI ARYANTY(1)-signed.pdf", "st": "noend", "bad": false}, {"id": 48, "name": "NDA PT EEN - MUHAMMAD RAFIFAN AKBAR", "dv": "ESG", "dp": "ESG Performance", "cat": "Contract Management", "inst": "IPB", "sd": "2026-06-13", "ed": null, "left": null, "file": "Drafting NDA PT EEN - MUHAMMAD RAFIFAN AKBAR(1)-signed.pdf", "st": "noend", "bad": false}], "meta": {"main_rows": 140, "proj_sheet_rows": 137, "proj_dup": 118, "docs": 48}};
-const $=id=>document.getElementById(id);
-const M=D.main,P=D.proj,DOC=D.docs;
-const SO=['Completed','In progress','Blocked','Not started'];
-const ST={'Completed':{l:'Selesai',c:'ok'},'In progress':{l:'Berjalan',c:'wip'},'Blocked':{l:'Terblokir',c:'bad'},'Not started':{l:'Belum mulai',c:'idle'}};
-const DS={expired:{l:'Kedaluwarsa',c:'bad'},soon:{l:'Segera berakhir',c:'wip'},active:{l:'Aktif',c:'ok'},noend:{l:'Tanpa tanggal berakhir',c:'idle'}};
-const LIT='Litigation & Dispute Resolution';
-const MON=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fd=s=>{if(!s)return '–';const [y,m,d]=s.split('-');return (+d)+' '+MON[+m-1]+' '+y};
-const cnt=(a,f)=>a.reduce((o,x)=>{const k=f(x);o[k]=(o[k]||0)+1;return o},{});
-const sum=a=>a.reduce((x,y)=>x+y,0);
-const avg=a=>a.length?sum(a)/a.length:null;
-const f1=n=>n==null?'–':n.toFixed(1).replace('.',',');
-const dvName=d=>d==='31011'?'31011 (perlu dicek)':d;
-const badge=k=>`<span class="badge b-${ST[k].c}">${ST[k].l}</span>`;
-const pri=p=>`<span class="pri ${p==='P0'?'p0':p==='P1'?'p1':''}">${esc(p||'–')}</span>`;
-const ttl=t=>t.title?esc(t.title):`<span class="nt">Tanpa judul · ${esc(t.cat)}</span>`;
-function seg(c){
-  const lab=SO.filter(k=>c[k]).map(k=>ST[k].l+' '+c[k]).join(', ');
-  return `<div class="seg" role="img" aria-label="${esc(lab)}">`+SO.filter(k=>c[k]).map(k=>`<i class="s-${ST[k].c}" style="flex:${c[k]}"></i>`).join('')+`</div>`;
-}
-/* ---- derived numbers ---- */
-const N=M.length,C=cnt(M,x=>x.st),OK=C['Completed']||0,WIP=C['In progress']||0,BK=C['Blocked']||0;
-const PCT=N?Math.round(OK/N*100):0;
-const slaList=M.filter(x=>x.st==='Completed'&&x.dur!=null).map(x=>x.dur);
-const SLA=avg(slaList);
-const blocked=M.filter(x=>x.st==='Blocked');
-const bk31=blocked.filter(x=>x.dv==='31011').length;
-const n31=M.filter(x=>x.dv==='31011').length;
-const ages=blocked.map(x=>x.age).filter(x=>x!=null);
-const overdue=M.filter(x=>x.st==='In progress'&&x.ed&&x.ed<D.today);
-const noTitle=M.filter(x=>!x.title).length;
-const noDept=M.filter(x=>!x.dp).length;
-const doneNoEnd=M.filter(x=>x.st==='Completed'&&!x.ed).length;
-const noStart=M.filter(x=>!x.sd).length;
-const docC=cnt(DOC,x=>x.st);
-const docBad=DOC.filter(x=>x.bad).length;
-const projC=cnt(P,x=>x.st);
-/* ---- navigation ---- */
-const ICON={
-  ringkasan:'<path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z"/>',
-  tracker:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
-  litigasi:'<path d="M14 13l-8.5 8.5a2.1 2.1 0 01-3-3L11 10M16 16l6-6M8 8l6-6M9 7l8 8M21 11l-8-8"/>',
-  nonlitigasi:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
-  blocked:'<path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/>',
-  proyek:'<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>',
-  dokumen:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h8"/>',
-  data:'<path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3"/>'
-};
-const TABS=[
-  ['g','Ringkasan'],['ringkasan','Dashboard utama'],['tracker','Tracker utama'],
-  ['g','Penanganan'],['litigasi','Litigasi'],['nonlitigasi','Non litigasi'],['blocked','Antrean terblokir'],
-  ['g','Proyek dan dokumen'],['proyek','Proyek'],['dokumen','Daftar dokumen'],
-  ['g','Kualitas data'],['data','Catatan data']
-];
-const TT={ringkasan:'Dashboard utama',tracker:'Tracker utama',litigasi:'Litigasi',nonlitigasi:'Non litigasi',blocked:'Antrean terblokir',proyek:'Proyek',dokumen:'Daftar dokumen',data:'Catatan data'};
-const SUBT={ringkasan:'Kondisi permintaan legal dan compliance',tracker:'Semua permintaan di Main Tracker',litigasi:'Permintaan kategori Litigation & Dispute Resolution',nonlitigasi:'Permintaan di luar litigasi',blocked:'Permintaan berstatus Blocked',proyek:'Sheet Project: task proyek dan sub-task',dokumen:'Sheet Document Lists: masa berlaku dokumen',data:'Apa yang sudah disamakan dan apa yang perlu dibenahi di Excel'};
-$('nav').innerHTML=TABS.map(t=>t[0]==='g'?`<div class="ngrp">${t[1]}</div>`:
-  `<button class="nav" data-tab="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[t[0]]}</svg>${t[1]}${t[0]==='blocked'?`<span class="nb">${BK}</span>`:''}</button>`).join('');
-$('asof').textContent='Data per '+fd(D.today);
-$('nav').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)go(b.dataset.tab)});
-$('view').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
-const openSb=()=>{$('side').classList.add('on');$('scrim').classList.add('on')};
-const closeSb=()=>{$('side').classList.remove('on');$('scrim').classList.remove('on')};
-$('menu').onclick=openSb;$('scrim').onclick=closeSb;
-let cur='ringkasan',charts=[];
-const kill=()=>{charts.forEach(c=>c.destroy());charts=[]};
-const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-function go(t){
-  cur=t;kill();closeSb();
-  document.querySelectorAll('.nav').forEach(b=>b.toggleAttribute('aria-current',b.dataset.tab===t)||0);
-  document.querySelectorAll('.nav').forEach(b=>{if(b.dataset.tab===t)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
-  $('ttl').textContent=TT[t];$('stl').textContent=SUBT[t];
-  ({ringkasan:vSummary,tracker:vList,litigasi:vList,nonlitigasi:vList,blocked:vList,proyek:vProj,dokumen:vDocs,data:vData})[t](t);
-  $('view').scrollTop=0;
-}
-/* ---- summary ---- */
-function vSummary(){
-  const dvc=Object.entries(cnt(M,x=>x.dv)).sort((a,b)=>b[1]-a[1]);
-  const cats=Object.entries(cnt(M,x=>x.cat)).sort((a,b)=>b[1]-a[1]);
-  const prs=['P0','P1','P2','P3'];
-  const att=[];
-  if(bk31) att.push(['bad',bk31,`Tugas terblokir memakai kode divisi 31011`,`${bk31} dari ${BK} tugas terblokir ada di kode ini. Semuanya kategori Contract Management dan tanpa judul permintaan, jadi belum jelas siapa pemiliknya.`,'blocked','Lihat antrean']);
-  if(ages.length) att.push(['bad',Math.max(...ages),`Hari: tugas terblokir tertua`,`Dihitung dari tanggal mulai sampai ${fd(D.today)}. Rata-rata umur tugas terblokir ${f1(avg(ages))} hari.`,'blocked','Lihat antrean']);
-  if(overdue.length) att.push(['wip',overdue.length,`Tugas berjalan sudah lewat tanggal akhir`,overdue.map(x=>esc(x.title||x.cat)).join('; ')+'.','tracker','Buka tracker']);
-  const pw=P.filter(x=>x.pi);
-  if(pw.length) att.push(['wip',pw.length,`Sub-task proyek berjalan dengan kendala`,pw.map(x=>esc(x.sub)).join('; ')+'.','proyek','Lihat proyek']);
-  if(docC.noend) att.push(['info',docC.noend,`Dokumen belum punya tanggal berakhir`,`Dari ${DOC.length} dokumen, masa berlakunya belum bisa dipantau sampai tanggal berakhir diisi.`,'dokumen','Lihat dokumen']);
-  $('view').innerHTML=`
-  <section class="hero" aria-label="Ringkasan status">
-    <div class="hero-top">
-      <div><div class="big">${PCT}<small>%</small></div><div class="hero-sub">permintaan sudah selesai</div></div>
-      <p><b>${OK} dari ${N}</b> permintaan di Main Tracker berstatus Selesai. ${BK} terblokir${bk31?`, ${bk31} di antaranya memakai kode divisi 31011`:''}. Permintaan yang selesai rata-rata memakan <b>${f1(SLA)} hari</b> dari tanggal mulai sampai selesai.</p>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<button class="cart-fab" onclick="toggleCart()" id="cartFab" aria-label="Keranjang">
+    <i class="fa-solid fa-basket-shopping"></i>
+    <span class="cart-badge" id="cartBadge">0</span>
+</button>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="#home" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:white;text-decoration:none;letter-spacing:0.03em;">PAK<span style="color:var(--amber);">CIKUR.</span></a>
+        <div class="nav-links">
+            <a href="#home" class="nav-link">Home</a>
+            <a href="#about" class="nav-link">Suasana</a>
+            <a href="#menu" class="nav-link">Menu</a>
+            <a href="#reviews" class="nav-link">Ulasan</a>
+            <a href="#gallery" class="nav-link">Gallery</a>
+            <a href="#contact" class="nav-link">Lokasi</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <button class="btn-primary nav-cta" style="font-size:12px;padding:9px 18px;" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+                <i class="fa-solid fa-location-dot"></i> Temukan Kami
+            </button>
+            <div class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
     </div>
-    ${seg(C)}
-    <div class="legend">${SO.filter(k=>C[k]).map(k=>`<span><i class="s-${ST[k].c}"></i><b>${C[k]}</b>${ST[k].l}</span>`).join('')}<span><b>${N}</b>Total permintaan</span></div>
-  </section>
-  <section class="panel">
-    <div class="row spread"><div><h2>Perlu perhatian</h2><p class="sub" style="margin:0">Dihitung otomatis dari data Excel.</p></div></div>
-    <ul class="attn" style="margin-top:14px">${att.map(a=>`<li><div class="n ${a[0]}">${a[1]}</div><div style="flex:1"><b>${a[2]}</b><span class="d">${a[3]}</span></div><button class="link" data-go="${a[4]}">${a[5]}</button></li>`).join('')}</ul>
-  </section>
-  <div class="g32">
-    <section class="panel"><h2>Permintaan masuk per bulan</h2><p class="sub">Berdasarkan tanggal mulai, dibagi menurut status saat ini. ${noStart} tugas tanpa tanggal mulai tidak ikut.</p><div class="chart" style="height:260px"><canvas id="c-month" role="img" aria-label="Permintaan per bulan menurut status"></canvas></div></section>
-    <section class="panel"><h2>Prioritas</h2><p class="sub">Jumlah permintaan dan statusnya.</p>
-      <ul class="bl">${prs.map(p=>{const s=M.filter(x=>x.p===p);const c=cnt(s,x=>x.st);return `<li><div class="h"><b>${p}</b><span>${s.length} permintaan · ${c['Completed']||0} selesai</span></div>${seg(c)}</li>`}).join('')}</ul></section>
-  </div>
-  <div class="g2">
-    <section class="panel"><h2>Beban per divisi</h2><p class="sub">Kode 31011 adalah nilai yang ada di kolom Division, belum jelas divisi apa.</p><div class="chart" style="height:${Math.max(240,dvc.length*32+50)}px"><canvas id="c-div" role="img" aria-label="Beban per divisi menurut status"></canvas></div></section>
-    <section class="panel"><h2>Progres per kategori</h2><p class="sub">Kategori memakai daftar Legal Frame Work di sheet Settings.</p>
-      <ul class="bl">${cats.map(([k,v])=>{const c=cnt(M.filter(x=>x.cat===k),x=>x.st);return `<li><div class="h"><b>${esc(k)}</b><span>${c['Completed']||0}/${v} selesai</span></div>${seg(c)}</li>`}).join('')}</ul></section>
-  </div>
-  <div class="g2">
-    <section class="panel"><div class="row spread"><h2>Proyek</h2><button class="link" data-go="proyek">Buka proyek</button></div><p class="sub">${P.length} sub-task di ${new Set(P.map(x=>x.project)).size} proyek.</p>
-      <ul class="bl">${[...new Set(P.map(x=>x.project))].map(pn=>{const s=P.filter(x=>x.project===pn);const c=cnt(s,x=>x.st);return `<li><div class="h"><b>${esc(pn)}</b><span>${c['Completed']||0}/${s.length} sub-task selesai</span></div>${seg(c)}</li>`}).join('')}</ul></section>
-    <section class="panel"><div class="row spread"><h2>Dokumen</h2><button class="link" data-go="dokumen">Buka dokumen</button></div><p class="sub">${DOC.length} dokumen di sheet Document Lists.</p>
-      <ul class="bl">${Object.keys(DS).filter(k=>docC[k]).map(k=>`<li><div class="h"><b>${DS[k].l}</b><span>${docC[k]} dokumen</span></div><div class="seg"><i class="s-${DS[k].c}" style="flex:${docC[k]}"></i><i style="flex:${DOC.length-docC[k]};background:transparent"></i></div></li>`).join('')}</ul></section>
-  </div>`;
-  if(!window.Chart)return;
-  Chart.defaults.font.family="'Plus Jakarta Sans',system-ui,sans-serif";Chart.defaults.font.size=12;
-  Chart.defaults.color=css('--muted');
-  const grid=css('--line');
-  const ks=['Completed','In progress','Blocked'];
-  const cols={Completed:css('--c-ok'),'In progress':css('--c-wip'),Blocked:css('--c-bad')};
-  const mk=[...new Set(M.filter(x=>x.sd).map(x=>x.sd.slice(0,7)))].sort();
-  charts.push(new Chart($('c-month'),{type:'bar',data:{labels:mk.map(k=>MON[+k.slice(5)-1]+' '+k.slice(2,4)),datasets:ks.map(k=>({label:ST[k].l,backgroundColor:cols[k],borderRadius:3,data:mk.map(m=>M.filter(x=>x.sd&&x.sd.slice(0,7)===m&&x.st===k).length)}))},
-    options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:grid},ticks:{precision:0}}},plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}}}}));
-  charts.push(new Chart($('c-div'),{type:'bar',data:{labels:dvc.map(x=>dvName(x[0])),datasets:ks.map(k=>({label:ST[k].l,backgroundColor:cols[k],data:dvc.map(([d])=>M.filter(x=>x.dv===d&&x.st===k).length)}))},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,grid:{color:grid},ticks:{precision:0}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}}}}));
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#home" onclick="closeMobileMenu()"><i class="fa-solid fa-house" style="width:18px;color:var(--amber)"></i> Home</a>
+    <a href="#about" onclick="closeMobileMenu()"><i class="fa-solid fa-store" style="width:18px;color:var(--amber)"></i> Suasana</a>
+    <a href="#menu" onclick="closeMobileMenu()"><i class="fa-solid fa-bowl-rice" style="width:18px;color:var(--amber)"></i> Menu</a>
+    <a href="#reviews" onclick="closeMobileMenu()"><i class="fa-solid fa-star" style="width:18px;color:var(--amber)"></i> Ulasan</a>
+    <a href="#gallery" onclick="closeMobileMenu()"><i class="fa-solid fa-image" style="width:18px;color:var(--amber)"></i> Gallery</a>
+    <a href="#contact" onclick="closeMobileMenu()"><i class="fa-solid fa-map-pin" style="width:18px;color:var(--amber)"></i> Lokasi</a>
+    <div style="padding:12px 16px;">
+        <button class="wa-btn" onclick="window.open('https://wa.me/6285863927084','_blank');closeMobileMenu()">
+            <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp
+        </button>
+    </div>
+</div>
+
+<div class="promo-bar" style="top:60px;">
+    <div class="marquee-track" style="font-size:11px;font-weight:700;color:var(--amber);">
+        <span>🔥 Happy Hour 17.00–19.00 — Diskon 15% Semua Minuman!</span>
+        <span>🍜 Paket A mulai Rp 20.000 — Nasi + Lauk + Minum!</span>
+        <span>☕ Kopi Soda Rp 12.000 — Seger abis!</span>
+        <span>📱 Order via WA: +62 858-6392-7084</span>
+        <span>🌟 Follow @warungpakcikur untuk promo eksklusif!</span>
+        <span>🔥 Happy Hour 17.00–19.00 — Diskon 15% Semua Minuman!</span>
+        <span>🍜 Paket A mulai Rp 20.000 — Nasi + Lauk + Minum!</span>
+        <span>☕ Kopi Soda Rp 12.000 — Seger abis!</span>
+        <span>📱 Order via WA: +62 858-6392-7084</span>
+        <span>🌟 Follow @warungpakcikur untuk promo eksklusif!</span>
+    </div>
+</div>
+
+<section id="home" class="hero-bg" style="min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:140px 20px 80px;position:relative;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center bottom,rgba(245,158,11,0.06) 0%,transparent 65%);pointer-events:none;"></div>
+    <div style="max-width:700px;margin:0 auto;position:relative;z-index:2;">
+        <div class="animate-fade-up" style="animation-delay:0.1s">
+            <span class="label-tag" style="margin-bottom:18px;display:inline-flex;">
+                <i class="fa-solid fa-star" style="font-size:9px;"></i>
+                Warung Rakyat, Rasa Juara
+            </span>
+        </div>
+        <h1 class="animate-fade-up hero-h1" style="font-size:3.2rem;font-weight:800;color:white;line-height:1.15;letter-spacing:-0.02em;margin-bottom:18px;animation-delay:0.2s">
+            Menu Lengkap,<br><span class="gradient-text">Harga Ramah Kantong.</span>
+        </h1>
+        <p class="animate-fade-up" style="font-size:1rem;color:#94a3b8;line-height:1.7;max-width:520px;margin:0 auto 30px;animation-delay:0.3s">
+            100+ pilihan menu dari nasi goreng, mie, seblak, cemilan, hingga minuman segar. Semuanya enak, semua terjangkau!
+        </p>
+        <div class="animate-fade-up hero-btns" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;animation-delay:0.4s">
+            <button class="btn-primary" style="font-size:14px;padding:13px 26px;" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">
+                <i class="fa-solid fa-bowl-rice"></i> Lihat Menu Lengkap
+            </button>
+            <button class="btn-outline" onclick="window.open('https://wa.me/6285863927084','_blank')" style="font-size:14px;">
+                <i class="fa-brands fa-whatsapp" style="color:#22c55e;"></i> Order via WA
+            </button>
+        </div>
+
+        <div class="animate-fade-up hero-stats" style="display:flex;gap:24px;justify-content:center;margin-top:44px;flex-wrap:wrap;animation-delay:0.5s">
+            <div style="text-align:center;">
+                <div style="font-size:1.7rem;font-weight:800;color:white;font-family:'Syne',sans-serif;">4.9★</div>
+                <div style="font-size:11px;color:#64748b;">Rating Google</div>
+            </div>
+            <div class="hero-stat-divider" style="width:1px;background:var(--border);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:1.7rem;font-weight:800;color:white;font-family:'Syne',sans-serif;">100+</div>
+                <div style="font-size:11px;color:#64748b;">Pilihan Menu</div>
+            </div>
+            <div class="hero-stat-divider" style="width:1px;background:var(--border);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:1.7rem;font-weight:800;color:white;font-family:'Syne',sans-serif;">Rp 3k</div>
+                <div style="font-size:11px;color:#64748b;">Mulai dari</div>
+            </div>
+            <div class="hero-stat-divider" style="width:1px;background:var(--border);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:1.7rem;font-weight:800;color:white;font-family:'Syne',sans-serif;">2K+</div>
+                <div style="font-size:11px;color:#64748b;">Pelanggan Setia</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-bottom" style="position:absolute;bottom:24px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="background:rgba(14,20,36,0.85);border:1px solid var(--border);border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:8px;backdrop-filter:blur(12px);">
+            <span class="chip chip-open" id="openStatus">
+                <span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;"></span>
+                Sedang Buka
+            </span>
+            <span style="font-size:11px;color:#64748b;">Tutup 02.00 WIB</span>
+        </div>
+        <div class="animate-float hero-cards" style="background:rgba(14,20,36,0.85);border:1px solid var(--border);border-radius:16px;padding:12px 16px;backdrop-filter:blur(12px);display:flex;align-items:center;gap:10px;">
+            <div style="font-size:22px;">🍜</div>
+            <div>
+                <div style="font-size:10px;color:#64748b;font-weight:600;">Menu Terfavorit</div>
+                <div style="font-size:13px;font-weight:700;color:white;">Nasgor Komplit</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="bg-mesh" style="padding:80px 20px;max-width:1100px;margin:0 auto;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;" class="about-grid reveal">
+        <div>
+            <span class="label-tag" style="margin-bottom:14px;display:inline-flex;">Tentang Kami</span>
+            <h2 style="font-size:2rem;font-weight:800;color:white;line-height:1.2;margin-bottom:16px;">
+                Warung Makan Enak,<br>Harga Bersahabat
+            </h2>
+            <p style="color:#64748b;line-height:1.8;margin-bottom:24px;font-size:14px;">
+                Warung Pak Cikur hadir dengan pilihan menu yang beragam dan terjangkau. Dari nasi goreng spesial, aneka mie, seblak, hingga minuman segar — semua ada di sini. Cocok untuk makan siang, nongkrong sore, hingga makan malam bersama keluarga.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+                <div class="card" style="padding:14px;">
+                    <div style="font-size:18px;margin-bottom:6px;">🍽️</div>
+                    <div style="font-weight:700;color:white;font-size:13px;margin-bottom:3px;">100+ Menu</div>
+                    <div style="font-size:11px;color:#64748b;">Pilihan lengkap setiap hari</div>
+                </div>
+                <div class="card" style="padding:14px;">
+                    <div style="font-size:18px;margin-bottom:6px;">💰</div>
+                    <div style="font-weight:700;color:white;font-size:13px;margin-bottom:3px;">Mulai Rp 3.000</div>
+                    <div style="font-size:11px;color:#64748b;">Harga ramah semua kalangan</div>
+                </div>
+                <div class="card" style="padding:14px;">
+                    <div style="font-size:18px;margin-bottom:6px;">🕐</div>
+                    <div style="font-weight:700;color:white;font-size:13px;margin-bottom:3px;">Buka Setiap Hari</div>
+                    <div style="font-size:11px;color:#64748b;">08.00 – 22.00 WIB</div>
+                </div>
+                <div class="card" style="padding:14px;">
+                    <div style="font-size:18px;margin-bottom:6px;">📱</div>
+                    <div style="font-weight:700;color:white;font-size:13px;margin-bottom:3px;">Order via WA</div>
+                    <div style="font-size:11px;color:#64748b;">Cepat & mudah</div>
+                </div>
+            </div>
+        </div>
+        <div class="about-imgs" style="display:grid;grid-template-columns:7fr 5fr;gap:10px;">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=600" alt="Suasana" style="width:100%;height:260px;object-fit:cover;border-radius:18px;border:1px solid var(--border);">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=300" alt="Detail" style="width:100%;height:120px;object-fit:cover;border-radius:14px;border:1px solid var(--border);">
+                <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;flex:1;display:flex;flex-direction:column;justify-content:center;">
+                    <div style="font-size:1.6rem;font-weight:800;color:var(--amber);font-family:'Syne',sans-serif;">5+</div>
+                    <div style="font-size:11px;color:#64748b;">Tahun Melayani</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="menu" style="padding:60px 20px;background:rgba(255,255,255,0.01);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div style="max-width:1100px;margin:0 auto;">
+        <div style="text-align:center;max-width:500px;margin:0 auto 36px;" class="reveal">
+            <span class="label-tag" style="margin-bottom:12px;display:inline-flex;">Menu Lengkap</span>
+            <h2 style="font-size:2rem;font-weight:800;color:white;margin-bottom:10px;">100+ Pilihan Menu</h2>
+            <p style="color:#64748b;font-size:13px;line-height:1.6;">Dari nasi, mie, cemilan, hingga minuman. Semua ada, semua enak!</p>
+        </div>
+
+        <div class="floating-search">
+            <div class="search-box" style="max-width:480px;margin:0 auto 14px;">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input class="form-input" id="menuSearch" placeholder="Cari menu... (contoh: nasgor, mie, juice)" oninput="searchMenu(this.value)" style="padding-left:40px;">
+            </div>
+            <div class="filter-scroll" style="justify-content:center;">
+                <button class="menu-category-tab active" onclick="filterCat('all',this)">🍴 Semua</button>
+                <button class="menu-category-tab" onclick="filterCat('paket',this)">🎁 Paket</button>
+                <button class="menu-category-tab" onclick="filterCat('nasi',this)">🍚 Nasi/Nasgor</button>
+                <button class="menu-category-tab" onclick="filterCat('mie',this)">🍜 Mie & Spaghetti</button>
+                <button class="menu-category-tab" onclick="filterCat('makanan',this)">🔥 Makanan WOW</button>
+                <button class="menu-category-tab" onclick="filterCat('cemilan-asin',this)">🍟 Cemilan Asin</button>
+                <button class="menu-category-tab" onclick="filterCat('cemilan-manis',this)">🍌 Cemilan Manis</button>
+                <button class="menu-category-tab" onclick="filterCat('minuman',this)">🥤 Minuman Segar</button>
+                <button class="menu-category-tab" onclick="filterCat('kopi',this)">☕ Kopi & Rempah</button>
+                <button class="menu-category-tab" onclick="filterCat('juice',this)">🍊 Juice & Dewegan</button>
+            </div>
+        </div>
+
+        <div id="menuContainer" style="margin-top:16px;"></div>
+
+        <div id="menuEmpty" class="empty-state" style="display:none;">
+            <div style="font-size:48px;opacity:.3;">🔍</div>
+            <p style="color:#64748b;font-size:14px;">Menu tidak ditemukan</p>
+            <button class="btn-outline" onclick="document.getElementById('menuSearch').value='';filterCat('all',document.querySelector('.menu-category-tab'))">Reset Pencarian</button>
+        </div>
+    </div>
+</section>
+
+<section id="reviews" style="padding:70px 20px;max-width:1100px;margin:0 auto;">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:32px;" class="reveal">
+        <div>
+            <span class="label-tag" style="margin-bottom:10px;display:inline-flex;">Testimoni</span>
+            <h2 style="font-size:1.8rem;font-weight:800;color:white;">Kata Mereka</h2>
+        </div>
+        <button class="btn-primary" onclick="openReviewModal()" style="font-size:13px;">
+            <i class="fa-solid fa-pen-to-square"></i> Tulis Ulasan
+        </button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:24px;" class="rating-summary-grid reveal">
+        <div style="text-align:center;padding-right:28px;border-right:1px solid var(--border);">
+            <div style="font-size:3.5rem;font-weight:800;color:white;font-family:'Syne',sans-serif;line-height:1;">4.9</div>
+            <div style="color:var(--amber);font-size:16px;margin:5px 0;">★★★★★</div>
+            <div style="font-size:11px;color:#64748b;">dari 238 ulasan</div>
+        </div>
+        <div id="ratingBars" style="display:flex;flex-direction:column;gap:7px;"></div>
+    </div>
+
+    <div id="reviewGrid" class="reveal" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:20px;"></div>
+    <div style="text-align:center;">
+        <button class="btn-outline" onclick="loadMoreReviews()" style="font-size:13px;">
+            <i class="fa-solid fa-chevron-down"></i> Lihat Lebih Banyak
+        </button>
+    </div>
+</section>
+
+<section id="gallery" style="padding:70px 0;border-top:1px solid var(--border);">
+    <div style="max-width:1100px;margin:0 auto;padding:0 20px;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px;" class="reveal">
+            <div>
+                <span class="label-tag" style="margin-bottom:10px;display:inline-flex;">Gallery</span>
+                <h2 style="font-size:1.8rem;font-weight:800;color:white;">Sudut Estetik</h2>
+            </div>
+            <a href="https://www.instagram.com/warungpakcikur" target="_blank" style="display:flex;align-items:center;gap:6px;color:var(--amber);font-size:13px;font-weight:700;text-decoration:none;">
+                <i class="fa-brands fa-instagram" style="font-size:16px;"></i> @warungpakcikur
+            </a>
+        </div>
+        <div class="gallery-grid reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&q=80&w=1200')">
+                <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&q=80&w=400" alt="Nasgor">
+                <div class="gallery-overlay"><span style="color:white;font-size:12px;font-weight:600;">🍳 Nasi Goreng Spesial</span></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&q=80&w=1200')">
+                <img src="https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&q=80&w=400" alt="Mie">
+                <div class="gallery-overlay"><span style="color:white;font-size:12px;font-weight:600;">🍜 Aneka Mie</span></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=1200')">
+                <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=400" alt="Kopi">
+                <div class="gallery-overlay"><span style="color:white;font-size:12px;font-weight:600;">☕ Kopi Segar</span></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1499638673689-79a0b5115d87?auto=format&fit=crop&q=80&w=1200')">
+                <img src="https://images.unsplash.com/photo-1499638673689-79a0b5115d87?auto=format&fit=crop&q=80&w=400" alt="Minuman">
+                <div class="gallery-overlay"><span style="color:white;font-size:12px;font-weight:600;">🥤 Minuman Segar</span></div>
+            </div>
+            <div class="gallery-item" style="grid-column:span 2;" onclick="openLightbox('https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?auto=format&fit=crop&q=80&w=1200')">
+                <img src="https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?auto=format&fit=crop&q=80&w=800" alt="Cemilan" style="height:200px;">
+                <div class="gallery-overlay"><span style="color:white;font-size:12px;font-weight:600;">🍟 Cemilan Hangat</span></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=1200')">
+                <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=400" alt="Seblak">
+                <div class="gallery-overlay"><span style="color:white;font-size:12px;font-weight:600;">🔥 Seblak Pedas</span></div>
+            </div>
+            <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1200')">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=400" alt="Suasana">
+                <div class="gallery-overlay"><span style="color:white;font-size:12px;font-weight:600;">🏮 Suasana Warung</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contact" style="padding:70px 20px;">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:5fr 7fr;gap:40px;align-items:start;" class="contact-grid reveal">
+        <div>
+            <span class="label-tag" style="margin-bottom:12px;display:inline-flex;">Lokasi & Kontak</span>
+            <h2 style="font-size:1.8rem;font-weight:800;color:white;margin-bottom:20px;">Mampir & Pesan!</h2>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px;">
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-map-pin" style="color:var(--amber);font-size:13px;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:#64748b;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Alamat</div>
+                        <div style="font-size:13px;color:#cbd5e1;line-height:1.6;">Warung Madu AM Pak Cikur, Bandung</div>
+                        <a href="https://maps.app.goo.gl/NasBi2SL7Nr4LCzu8" target="_blank" style="font-size:11px;color:var(--amber);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:4px;"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;"></i> Buka di Google Maps</a>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-clock" style="color:var(--amber);font-size:13px;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:#64748b;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Jam Operasional</div>
+                        <div style="font-size:13px;color:#cbd5e1;">Setiap Hari: 08.00 — 22.00 WIB</div>
+                        <span class="chip chip-open" id="openStatus2" style="margin-top:5px;font-size:10px;">
+                            <span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;"></span>
+                            Sedang Buka
+                        </span>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-phone" style="color:var(--amber);font-size:13px;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:#64748b;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">WhatsApp</div>
+                        <div style="font-size:13px;color:#cbd5e1;">+62 858-6392-7084</div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-brands fa-instagram" style="color:var(--amber);font-size:13px;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:#64748b;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Instagram</div>
+                        <a href="https://www.instagram.com/warungpakcikur" target="_blank" style="font-size:13px;color:var(--amber);text-decoration:none;">@warungpakcikur</a>
+                    </div>
+                </div>
+            </div>
+            <button class="wa-btn" onclick="window.open('https://wa.me/6285863927084?text=Halo%20Pak%20Cikur!%20Mau%20order%20dong','_blank')">
+                <i class="fa-brands fa-whatsapp" style="font-size:18px;"></i>
+                Order via WhatsApp Sekarang
+            </button>
+        </div>
+        <div style="border-radius:20px;overflow:hidden;border:1px solid var(--border);height:380px;">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.0!2d107.6413775!3d-6.8531838!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e737103ff199%3A0x9329c7cd317c6b4a!2sWarung%20Madu%20AM%20Pak%20Cikur!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid" class="map-frame" style="width:100%;height:100%;border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+    </div>
+</section>
+
+<footer style="padding:32px 20px;background:#05080f;border-top:1px solid var(--border);text-align:center;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:white;margin-bottom:6px;">PAK<span style="color:var(--amber);">CIKUR.</span></div>
+    <p style="font-size:12px;color:#334155;margin-bottom:14px;">Warung Rakyat — Menu Lengkap, Harga Ramah Kantong</p>
+    <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px;">
+        <a href="https://www.instagram.com/warungpakcikur" target="_blank" style="color:#334155;font-size:18px;transition:color .2s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#334155'"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://wa.me/6285863927084" target="_blank" style="color:#334155;font-size:18px;transition:color .2s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#334155'"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://www.facebook.com/warungpakcikur" target="_blank" style="color:#334155;font-size:18px;transition:color .2s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#334155'"><i class="fa-brands fa-facebook"></i></a>
+    </div>
+    <p style="font-size:11px;color:#1e293b;">&copy; 2026 Warung Pak Cikur. All Rights Reserved.</p>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <div>
+            <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:white;">Keranjang</h3>
+            <p style="font-size:11px;color:#64748b;margin-top:2px;" id="cartItemCount">0 item</p>
+        </div>
+        <button onclick="toggleCart()" style="width:34px;height:34px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border);color:#94a3b8;cursor:pointer;">✕</button>
+    </div>
+    <div class="cart-body" id="cartBody">
+        <div class="empty-state" id="emptyCart">
+            <div style="font-size:44px;opacity:.3;">🛒</div>
+            <p style="color:#64748b;font-size:13px;">Keranjang masih kosong</p>
+            <p style="color:#475569;font-size:11px;">Yuk, pilih menu favoritmu!</p>
+        </div>
+        <div id="cartItems"></div>
+    </div>
+    <div style="padding:0 16px 12px;" id="couponSection" style="display:none;">
+        <div class="coupon-wrap">
+            <input class="form-input" id="couponInput" placeholder="Kode promo..." style="font-size:12px;">
+            <button class="coupon-apply" onclick="applyCoupon()">Pakai</button>
+        </div>
+        <div id="couponMsg" style="font-size:11px;margin-top:5px;"></div>
+    </div>
+    <div class="cart-footer">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;" id="cartSummary" style="display:none;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;"><span>Subtotal</span><span id="subtotalText">Rp 0</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;"><span>Diskon</span><span id="discountText" style="color:#4ade80;">-Rp 0</span></div>
+            <hr class="divider">
+            <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:white;"><span>Total</span><span id="totalText" style="color:var(--amber);">Rp 0</span></div>
+        </div>
+        <button class="btn-primary" style="width:100%;padding:13px;font-size:14px;" id="checkoutBtn" onclick="openCheckout()" disabled>
+            <i class="fa-solid fa-arrow-right"></i> Pesan Sekarang
+        </button>
+        <p style="text-align:center;font-size:10px;color:#475569;margin-top:8px;"><i class="fa-solid fa-shield-halved" style="color:var(--amber);"></i> Dikonfirmasi via WhatsApp</p>
+    </div>
+</div>
+
+<div class="modal-overlay" id="checkoutModal">
+    <div class="modal-box">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:white;">Konfirmasi Pesanan</h3>
+                <button onclick="closeCheckout()" style="width:32px;height:32px;border-radius:9px;background:var(--bg-card);border:1px solid var(--border);color:#94a3b8;cursor:pointer;">✕</button>
+            </div>
+            <div style="display:flex;gap:5px;align-items:center;">
+                <div class="step-dot active" id="dot1"></div>
+                <div style="flex:1;height:1px;background:var(--border);"></div>
+                <div class="step-dot" id="dot2"></div>
+                <div style="flex:1;height:1px;background:var(--border);"></div>
+                <div class="step-dot" id="dot3"></div>
+            </div>
+        </div>
+        <div id="step1" style="padding:20px 24px;">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+                <div>
+                    <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">Nama</label>
+                    <input class="form-input" id="custName" placeholder="Nama kamu...">
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">Nomor WhatsApp</label>
+                    <input class="form-input" id="custPhone" placeholder="08xxxxxxxxxx" type="tel">
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">Tipe Pesanan</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <button onclick="selectOrderType('dine-in',this)" class="order-type-btn" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.08);color:var(--amber);">🍽️ Makan di Sini</button>
+                        <button onclick="selectOrderType('takeaway',this)" class="order-type-btn">📦 Bawa Pulang</button>
+                    </div>
+                </div>
+                <div id="tableField">
+                    <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">No. Meja (opsional)</label>
+                    <input class="form-input" id="tableNum" placeholder="Contoh: Meja 3...">
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">Catatan</label>
+                    <textarea class="form-input" id="custNote" placeholder="Level pedas, alergi, permintaan khusus..."></textarea>
+                </div>
+            </div>
+            <button class="btn-primary" style="width:100%;margin-top:18px;padding:13px;" onclick="goStep2()">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        <div id="step2" style="padding:20px 24px;display:none;">
+            <h4 style="font-size:13px;font-weight:700;color:white;margin-bottom:14px;">Ringkasan Pesanan</h4>
+            <div id="orderSummaryItems" style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;max-height:220px;overflow-y:auto;"></div>
+            <hr class="divider" style="margin-bottom:12px;">
+            <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;"><span>Subtotal</span><span id="s2subtotal"></span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#4ade80;"><span>Diskon</span><span id="s2discount"></span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:white;"><span>Total</span><span style="color:var(--amber);" id="s2total"></span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button class="btn-outline" onclick="goStep1()" style="font-size:13px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                <button class="btn-primary" onclick="goStep3()" style="font-size:13px;">Konfirmasi <i class="fa-solid fa-check"></i></button>
+            </div>
+        </div>
+        <div id="step3" style="padding:36px 24px;display:none;text-align:center;" class="success-state">
+            <svg width="64" height="64" viewBox="0 0 72 72" style="margin:0 auto 16px;">
+                <circle cx="36" cy="36" r="34" fill="rgba(34,197,94,0.1)" stroke="rgba(34,197,94,0.3)" stroke-width="1.5"/>
+                <path class="checkmark-path" d="M22 36 L32 46 L50 28" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:white;margin-bottom:8px;">Pesanan Masuk! 🎉</h3>
+            <p style="color:#64748b;font-size:13px;line-height:1.7;margin-bottom:10px;">Tim kami akan konfirmasi via WhatsApp segera.</p>
+            <div style="margin-bottom:16px;" id="syncStatusWrap">
+                <span class="sync-badge"><span class="sync-dot" id="syncDot"></span><span id="syncText">Menyinkronkan ke kasir...</span></span>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:20px;text-align:left;">
+                <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Nomor Order</div>
+                <div style="font-size:18px;font-weight:800;color:var(--amber);font-family:'Syne',sans-serif;" id="orderNumber">#PC-0000</div>
+            </div>
+            <button class="wa-btn" id="waConfirmBtn"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Chat via WhatsApp</button>
+            <button class="btn-outline" style="width:100%;margin-top:8px;font-size:13px;" onclick="closeCheckout();clearCart();">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="reviewModal">
+    <div class="modal-box">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:white;">Tulis Ulasan</h3>
+            <button onclick="closeReviewModal()" style="width:32px;height:32px;border-radius:9px;background:var(--bg-card);border:1px solid var(--border);color:#94a3b8;cursor:pointer;">✕</button>
+        </div>
+        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
+            <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px;">Rating</label>
+                <div class="star-rating" id="starRating">
+                    <span class="star" onclick="setRating(1)" data-val="1">★</span>
+                    <span class="star" onclick="setRating(2)" data-val="2">★</span>
+                    <span class="star" onclick="setRating(3)" data-val="3">★</span>
+                    <span class="star" onclick="setRating(4)" data-val="4">★</span>
+                    <span class="star" onclick="setRating(5)" data-val="5">★</span>
+                </div>
+            </div>
+            <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">Nama</label>
+                <input class="form-input" id="reviewName" placeholder="Namamu...">
+            </div>
+            <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">Ulasan</label>
+                <textarea class="form-input" id="reviewText" placeholder="Ceritakan pengalamanmu..." style="min-height:100px;"></textarea>
+            </div>
+            <button class="btn-primary" style="width:100%;padding:13px;" onclick="submitReview()">
+                <i class="fa-solid fa-paper-plane"></i> Kirim Ulasan
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button onclick="closeLightbox()" style="position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);border:none;color:white;font-size:18px;cursor:pointer;">✕</button>
+    <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+// =====================================================================
+// KONFIGURASI JEMBATAN (BRIDGE) KE KASIR
+// Tempel URL Web App Google Apps Script Anda di sini (diakhiri /exec)
+// =====================================================================
+const BRIDGE_URL = 'PASTE_URL_WEB_APP_APPS_SCRIPT_DI_SINI';
+
+// ===================== FULL MENU DATA =====================
+const MENU_DATA = {
+    paket: {
+        label: '🎁 Paket Hemat',
+        subcats: {
+            'Paket Makan': [
+                { id:'pa1', name:'Paket A', price:20000, desc:'Nasi, Telor Ceplok/Dadar, Tahu, Tempe, Lalapan + Minum', badge:'', badgeType:'' },
+                { id:'pa2', name:'Paket B', price:23000, desc:'Nasi, Ayam + Lalapan + Minum', badge:'', badgeType:'' },
+                { id:'pa3', name:'Paket C', price:28000, desc:'Nasi, Ayam, Tahu, Tempe, Lalapan + Minum', badge:'Favorit', badgeType:'hot' },
+                { id:'pa4', name:'Paket D', price:30000, desc:'Nasi, Ayam Goreng/Bakar + Tahu, Tempe, Sayuran, Lalapan + Minum', badge:'', badgeType:'' },
+                { id:'pa5', name:'Paket E', price:30000, desc:'Nasi, Ayam/Peda/Sepat/Cumi + Tahu, Tempe, Sayuran, Lalapan + Minum', badge:'', badgeType:'' },
+            ]
+        }
+    },
+    nasi: {
+        label: '🍚 Nasi / Nasgor',
+        subcats: {
+            'Nasi Ayam': [
+                { id:'na1', name:'Nasi Ayam Geprek', price:20000, badge:'Laris', badgeType:'hot' },
+                { id:'na2', name:'Nasi Chicken Popcorn', price:25000, badge:'', badgeType:'' },
+                { id:'na3', name:'Nasi Cumi Ijjo', price:25000, badge:'', badgeType:'' },
+                { id:'na4', name:'Nasi Ayam Penyet Cabe Ijo', price:25000, badge:'', badgeType:'' },
+                { id:'na5', name:'Nasi Chicken Katsu', price:25000, badge:'', badgeType:'' },
+                { id:'na6', name:'Nasi Bowl Chicken Teriyaki', price:25000, badge:'New', badgeType:'new' },
+            ],
+            'Nasi Goreng (Nasgor)': [
+                { id:'ng1', name:'Nasgor Biasa', price:12000, badge:'', badgeType:'' },
+                { id:'ng2', name:'Nasgor Cikur', price:18000, badge:'Andalan', badgeType:'hot' },
+                { id:'ng3', name:'Nasgor Daun Jeruk', price:18000, badge:'', badgeType:'' },
+                { id:'ng4', name:'Nasgor Nanas', price:20000, badge:'', badgeType:'' },
+                { id:'ng5', name:'Nasgor Petai', price:20000, badge:'', badgeType:'' },
+                { id:'ng6', name:'Nasgor Mawut', price:20000, badge:'', badgeType:'' },
+                { id:'ng7', name:'Nasgor Ati Ampela', price:25000, badge:'', badgeType:'' },
+                { id:'ng8', name:'Nasgor Kemangi Cumi', price:25000, badge:'', badgeType:'' },
+                { id:'ng9', name:'Nasgor Rendang Ayam', price:25000, badge:'', badgeType:'' },
+                { id:'ng10', name:'Nasgor Seafood', price:30000, badge:'', badgeType:'' },
+                { id:'ng11', name:'Nasgor Komplit', price:35000, badge:'Best Seller', badgeType:'hot' },
+                { id:'ng12', name:'Nasgor Tetelan', price:25000, badge:'', badgeType:'' },
+            ]
+        }
+    },
+    mie: {
+        label: '🍜 Mie & Spaghetti',
+        subcats: {
+            'Spaghetti': [
+                { id:'sp1', name:'Spaghetti Biasa', price:12000, badge:'', badgeType:'' },
+                { id:'sp2', name:'Spaghetti Tulang', price:18000, badge:'', badgeType:'' },
+                { id:'sp3', name:'Spaghetti Carbonara', price:20000, badge:'', badgeType:'' },
+                { id:'sp4', name:'Spaghetti Bolognesse', price:20000, badge:'', badgeType:'' },
+                { id:'sp5', name:'Spaghetti Sambal Matah', price:25000, badge:'New', badgeType:'new' },
+            ],
+            'Aneka Mie': [
+                { id:'mi1', name:'Pop Mie K/G', price:12000, badge:'', badgeType:'' },
+                { id:'mi2', name:'Mie Kuah Polos', price:10000, badge:'', badgeType:'' },
+                { id:'mi3', name:'Mie Goreng Polos', price:12000, badge:'', badgeType:'' },
+                { id:'mi4', name:'Mie Kuah Telor', price:15000, badge:'', badgeType:'' },
+                { id:'mi5', name:'Mie Goreng Telor', price:17000, badge:'Laris', badgeType:'hot' },
+                { id:'mi6', name:'Mie Rebus Cilok', price:15000, badge:'', badgeType:'' },
+                { id:'mi7', name:'Mie Rebus Kornet', price:15000, badge:'', badgeType:'' },
+                { id:'mi8', name:'Mie Rebus Telor Kornet', price:20000, badge:'', badgeType:'' },
+                { id:'mi9', name:'Mie Kocok', price:15000, badge:'', badgeType:'' },
+                { id:'mi10', name:'Mie Setan', price:15000, badge:'🌶️', badgeType:'' },
+                { id:'mi11', name:'Mie Tek-Tek', price:20000, badge:'', badgeType:'' },
+                { id:'mi12', name:'Mie K/G Tetelan', price:25000, badge:'', badgeType:'' },
+                { id:'mi13', name:'Mie K/G Telor/Kornet Keju', price:20000, badge:'', badgeType:'' },
+                { id:'mi14', name:'Mie K/G Komplit (Telor, Kornet, Baso)', price:27000, badge:'Best Value', badgeType:'rec' },
+            ]
+        }
+    },
+    makanan: {
+        label: '🔥 Makanan WOW',
+        subcats: {
+            'Makanan WOW': [
+                { id:'mw1', name:'Cilok Kuah', price:15000, badge:'', badgeType:'' },
+                { id:'mw2', name:'Baso', price:15000, badge:'', badgeType:'' },
+                { id:'mw3', name:'Baso Ikan', price:15000, badge:'', badgeType:'' },
+                { id:'mw4', name:'Baso Cuanki', price:20000, badge:'', badgeType:'' },
+                { id:'mw5', name:'Baso Tusuk Goreng', price:15000, badge:'', badgeType:'' },
+                { id:'mw6', name:'Kwetiaw K/G', price:20000, badge:'', badgeType:'' },
+                { id:'mw7', name:'Bihun K/G', price:20000, badge:'', badgeType:'' },
+                { id:'mw8', name:'Kwetiaw Seafood K/G', price:25000, badge:'', badgeType:'' },
+                { id:'mw9', name:'Bihun Seafood K/G', price:25000, badge:'', badgeType:'' },
+                { id:'mw10', name:'Seblak Biasa', price:12000, badge:'', badgeType:'' },
+                { id:'mw11', name:'Seblak Tulang+Tahu+Kerupuk', price:15000, badge:'', badgeType:'' },
+                { id:'mw12', name:'Seblak Tucek', price:20000, badge:'', badgeType:'' },
+                { id:'mw13', name:'Seblak Komplit', price:20000, badge:'Favorit', badgeType:'hot' },
+                { id:'mw14', name:'Seblak Suki + Tulang', price:25000, badge:'', badgeType:'' },
+                { id:'mw15', name:'Seblak Suki Aja', price:20000, badge:'', badgeType:'' },
+            ]
+        }
+    },
+    'cemilan-asin': {
+        label: '🍟 Cemilan Asin',
+        subcats: {
+            'Cemilan Asin': [
+                { id:'ca1', name:'Kentang Goreng', price:12000, badge:'', badgeType:'' },
+                { id:'ca2', name:'Kentang Sosis', price:16000, badge:'', badgeType:'' },
+                { id:'ca3', name:'Kentang Nuget', price:16000, badge:'', badgeType:'' },
+                { id:'ca4', name:'Kentang Kornet', price:16000, badge:'', badgeType:'' },
+                { id:'ca5', name:'Nuget Sosis', price:16000, badge:'', badgeType:'' },
+                { id:'ca6', name:'Kornet Goreng', price:12000, badge:'', badgeType:'' },
+                { id:'ca7', name:'Sosis Bakar', price:12000, badge:'', badgeType:'' },
+                { id:'ca8', name:'Enoki Crispy', price:15000, badge:'', badgeType:'' },
+                { id:'ca9', name:'Onion Ring', price:15000, badge:'', badgeType:'' },
+                { id:'ca10', name:'Tahu Cabe Garam', price:15000, badge:'', badgeType:'' },
+                { id:'ca11', name:'Cireng Rujak', price:15000, badge:'', badgeType:'' },
+                { id:'ca12', name:'Cireng Suir Ayam', price:15000, badge:'', badgeType:'' },
+                { id:'ca13', name:'Tahu Walik', price:15000, badge:'', badgeType:'' },
+                { id:'ca14', name:'Basreng', price:12000, badge:'', badgeType:'' },
+                { id:'ca15', name:'Karedok Tahu', price:15000, badge:'', badgeType:'' },
+                { id:'ca16', name:'Karedok Basreng', price:15000, badge:'', badgeType:'' },
+                { id:'ca17', name:'Jagung Keriting', price:15000, badge:'', badgeType:'' },
+                { id:'ca18', name:'Mpek-Mpek', price:15000, badge:'', badgeType:'' },
+                { id:'ca19', name:'Mendoan Isi 5', price:10000, badge:'Murah!', badgeType:'rec' },
+                { id:'ca20', name:'Gorengan Isi 5', price:10000, badge:'Murah!', badgeType:'rec' },
+                { id:'ca21', name:'Burger', price:20000, badge:'', badgeType:'' },
+                { id:'ca22', name:'Hott Dog', price:20000, badge:'', badgeType:'' },
+                { id:'ca23', name:'Otak-Otak', price:15000, badge:'', badgeType:'' },
+                { id:'ca24', name:'Geci', price:15000, badge:'', badgeType:'' },
+            ]
+        }
+    },
+    'cemilan-manis': {
+        label: '🍌 Cemilan Manis',
+        subcats: {
+            'Pisang & Gorengan Manis': [
+                { id:'cm1', name:'Pisang Keju', price:12000, badge:'', badgeType:'' },
+                { id:'cm2', name:'Pisang Aroma', price:12000, badge:'', badgeType:'' },
+                { id:'cm3', name:'Pisang Goreng', price:12000, badge:'', badgeType:'' },
+                { id:'cm4', name:'Pisang Guren', price:15000, badge:'', badgeType:'' },
+                { id:'cm5', name:'Pisang Goreng Keju', price:15000, badge:'', badgeType:'' },
+                { id:'cm6', name:'Pisang Rambutan', price:15000, badge:'', badgeType:'' },
+                { id:'cm7', name:'Pisang Nuget', price:15000, badge:'', badgeType:'' },
+                { id:'cm8', name:'Ubi Goreng', price:12000, badge:'', badgeType:'' },
+                { id:'cm9', name:'Nangka Goreng', price:15000, badge:'', badgeType:'' },
+                { id:'cm10', name:'Nanas Goreng', price:15000, badge:'', badgeType:'' },
+                { id:'cm11', name:'Cheese Roll', price:15000, badge:'', badgeType:'' },
+                { id:'cm12', name:'Roti Bakar', price:15000, badge:'', badgeType:'' },
+                { id:'cm13', name:'Roti Lava Toast', price:18000, badge:'New', badgeType:'new' },
+                { id:'cm14', name:'Ice Cream Toast', price:18000, badge:'', badgeType:'' },
+                { id:'cm15', name:'Donat Es Krim', price:18000, badge:'', badgeType:'' },
+            ],
+            'Cincau': [
+                { id:'cc1', name:'Cincau Ori', price:12000, badge:'', badgeType:'' },
+                { id:'cc2', name:'Cincau Lemon', price:12000, badge:'', badgeType:'' },
+                { id:'cc3', name:'Cincau Rosella', price:15000, badge:'', badgeType:'' },
+                { id:'cc4', name:'Cincau Ice Cream', price:20000, badge:'', badgeType:'' },
+            ]
+        }
+    },
+    minuman: {
+        label: '🥤 Minuman Segar',
+        subcats: {
+            'Minuman Segar': [
+                { id:'ms1', name:'Aqua', price:5000, badge:'', badgeType:'' },
+                { id:'ms2', name:'Teh Tawar', price:3000, badge:'Termurah!', badgeType:'rec' },
+                { id:'ms3', name:'Pop Ice', price:7000, badge:'', badgeType:'' },
+                { id:'ms4', name:'Nutrisari', price:7000, badge:'', badgeType:'' },
+                { id:'ms5', name:'Josu', price:10000, badge:'', badgeType:'' },
+                { id:'ms6', name:'Kukubima', price:7000, badge:'', badgeType:'' },
+                { id:'ms7', name:'Susu Soda', price:12000, badge:'', badgeType:'' },
+                { id:'ms8', name:'Kopi Soda', price:12000, badge:'', badgeType:'' },
+                { id:'ms9', name:'Ice Teh Manis Jumbo', price:12000, badge:'', badgeType:'' },
+                { id:'ms10', name:'Ice Lemontea Jumbo', price:15000, badge:'', badgeType:'' },
+                { id:'ms11', name:'Ice Lecytea Jumbo', price:15000, badge:'', badgeType:'' },
+                { id:'ms12', name:'Grape Yakult', price:15000, badge:'', badgeType:'' },
+                { id:'ms13', name:'Strawberry Yakult', price:15000, badge:'', badgeType:'' },
+                { id:'ms14', name:'Orange Yakult', price:15000, badge:'', badgeType:'' },
+                { id:'ms15', name:'Lecy Yakult', price:15000, badge:'', badgeType:'' },
+                { id:'ms16', name:'Mango Yakult', price:15000, badge:'', badgeType:'' },
+                { id:'ms17', name:'Smoothies Oreo', price:15000, badge:'', badgeType:'' },
+                { id:'ms18', name:'Smoothies Mangga', price:15000, badge:'', badgeType:'' },
+                { id:'ms19', name:'Smoothies Strawberry', price:15000, badge:'', badgeType:'' },
+                { id:'ms20', name:'Mojito Melon', price:15000, badge:'', badgeType:'' },
+                { id:'ms21', name:'Mojito Lecy', price:15000, badge:'', badgeType:'' },
+                { id:'ms22', name:'Mojito Strawberry', price:15000, badge:'', badgeType:'' },
+                { id:'ms23', name:'Java Mojito', price:15000, badge:'', badgeType:'' },
+                { id:'ms24', name:'Virgin Mojito', price:15000, badge:'', badgeType:'' },
+                { id:'ms25', name:'Ice Kopi Susu Brownsugar', price:15000, badge:'Hits!', badgeType:'hot' },
+                { id:'ms26', name:'Caramel Macchiato', price:15000, badge:'', badgeType:'' },
+                { id:'ms27', name:'Vanilla Latte', price:15000, badge:'', badgeType:'' },
+                { id:'ms28', name:'Mocha Brownsugar', price:15000, badge:'', badgeType:'' },
+                { id:'ms29', name:'Caramellate', price:15000, badge:'', badgeType:'' },
+            ]
+        }
+    },
+    kopi: {
+        label: '☕ Kopi & Rempah',
+        subcats: {
+            'Kopi & Susu': [
+                { id:'ks1', name:'Kopi Sachet', price:5000, desc:'Kapal Api, ABC, Gooday, dll', badge:'', badgeType:'' },
+                { id:'ks2', name:'Susu Jahe/Jahe Merah P/D', price:7000, badge:'', badgeType:'' },
+                { id:'ks3', name:'Susu Frisian Flag P/D', price:7000, badge:'', badgeType:'' },
+                { id:'ks4', name:'Energen P/D', price:7000, badge:'', badgeType:'' },
+                { id:'ks5', name:'STMJ P/D', price:7000, badge:'', badgeType:'' },
+                { id:'ks6', name:'Chocolatos P/D', price:8000, badge:'', badgeType:'' },
+                { id:'ks7', name:'Beng-Beng Drink P/D', price:8000, badge:'', badgeType:'' },
+                { id:'ks8', name:'Teh Tarik P/D', price:8000, badge:'', badgeType:'' },
+                { id:'ks9', name:'Creamy Latte P/D', price:7000, badge:'', badgeType:'' },
+                { id:'ks10', name:'Dancaw P/D', price:8000, badge:'', badgeType:'' },
+                { id:'ks11', name:'Milo P/D', price:8000, badge:'', badgeType:'' },
+                { id:'ks12', name:'Capucino P/D', price:8000, badge:'', badgeType:'' },
+            ],
+            'Minuman Rempah': [
+                { id:'mr1', name:'Teh Manis P/D', price:5000, badge:'', badgeType:'' },
+                { id:'mr2', name:'Lemontea Biasa P/D', price:10000, badge:'', badgeType:'' },
+                { id:'mr3', name:'Lemontea Guren P/D', price:10000, badge:'', badgeType:'' },
+                { id:'mr4', name:'Bandrek Ori', price:10000, badge:'', badgeType:'' },
+                { id:'mr5', name:'Tape Goreng', price:15000, badge:'', badgeType:'' },
+                { id:'mr6', name:'Bandrek Madu', price:12000, badge:'', badgeType:'' },
+                { id:'mr7', name:'Bajigur', price:10000, badge:'', badgeType:'' },
+                { id:'mr8', name:'Teh Jahe', price:12000, badge:'', badgeType:'' },
+                { id:'mr9', name:'Teh Jahe Sereh', price:12000, badge:'Hangat', badgeType:'rec' },
+                { id:'mr10', name:'Teh Jahe Lemon', price:15000, badge:'', badgeType:'' },
+                { id:'mr11', name:'Teh Jahe Madu', price:15000, badge:'', badgeType:'' },
+                { id:'mr12', name:'Teh Jahe Komplit', price:15000, badge:'', badgeType:'' },
+                { id:'mr13', name:'Teh Rosella P/D', price:15000, badge:'', badgeType:'' },
+                { id:'mr14', name:'Lecci Tea P/D', price:10000, badge:'', badgeType:'' },
+                { id:'mr15', name:'Teh Mint P/D', price:10000, badge:'', badgeType:'' },
+            ]
+        }
+    },
+    juice: {
+        label: '🍊 Juice & Dewegan',
+        subcats: {
+            'Juice Buah': [
+                { id:'ju1', name:'Juice Mangga', price:10000, badge:'', badgeType:'' },
+                { id:'ju2', name:'Juice Alvukat', price:10000, badge:'', badgeType:'' },
+                { id:'ju3', name:'Juice Tomat', price:10000, badge:'', badgeType:'' },
+                { id:'ju4', name:'Juice Jambu', price:10000, badge:'', badgeType:'' },
+                { id:'ju5', name:'Juice Pisang', price:10000, badge:'', badgeType:'' },
+                { id:'ju6', name:'Juice Jeruk', price:10000, badge:'', badgeType:'' },
+                { id:'ju7', name:'Juice Apel', price:10000, badge:'', badgeType:'' },
+                { id:'ju8', name:'Juice Melon', price:10000, badge:'', badgeType:'' },
+                { id:'ju9', name:'Juice Semangka', price:10000, badge:'', badgeType:'' },
+                { id:'ju10', name:'Juice Buah Naga', price:10000, badge:'', badgeType:'' },
+                { id:'ju11', name:'Juice Nanas', price:10000, badge:'', badgeType:'' },
+                { id:'ju12', name:'Juice Raspberry', price:12000, badge:'', badgeType:'' },
+                { id:'ju13', name:'Juice Blackberry', price:12000, badge:'', badgeType:'' },
+                { id:'ju14', name:'Juice Strawberry', price:12000, badge:'', badgeType:'' },
+                { id:'ju15', name:'Juice Wortel', price:12000, badge:'', badgeType:'' },
+                { id:'ju16', name:'Juice Caisim', price:12000, badge:'', badgeType:'' },
+                { id:'ju17', name:'Es Jeruk Asli', price:10000, badge:'', badgeType:'' },
+            ],
+            'Aneka Dewegan': [
+                { id:'dw1', name:'Dewegan', price:12000, badge:'', badgeType:'' },
+                { id:'dw2', name:'ES Kelapa Muda', price:12000, badge:'', badgeType:'' },
+                { id:'dw3', name:'ES Kelapa Jeruk', price:12000, badge:'', badgeType:'' },
+                { id:'dw4', name:'Es Teler', price:15000, badge:'', badgeType:'' },
+                { id:'dw5', name:'Sop Buah', price:15000, badge:'', badgeType:'' },
+                { id:'dw6', name:'Salad Buah', price:15000, badge:'', badgeType:'' },
+            ]
+        }
+    }
+};
+
+// ===================== STATE =====================
+let cart = [];
+let discount = 0;
+let currentRating = 0;
+let orderType = 'dine-in';
+let reviewsShown = 3;
+let currentCat = 'all';
+let currentSearch = '';
+
+const COUPONS = { 'CIKUR10': 10, 'WARBU15': 15, 'MAKAN20': 20 };
+
+// ===================== REVIEWS =====================
+let REVIEWS_DATA = [
+    { name:'Raka P.', rating:5, text:'Menu lengkap banget! Nasgor Cikur enak banget, porsi besar harga terjangkau. Pasti balik lagi!', time:'2 hari lalu', avatar:'R' },
+    { name:'Siti N.', rating:5, text:'Seblak Komplitnya juara! Pedas gurih nampol. Minumannya juga banyak pilihan.', time:'4 hari lalu', avatar:'S' },
+    { name:'Deni F.', rating:4, text:'Warung favorit keluarga. Paket C-nya worth it banget, nasi ayam + lalapan + minum cuma 28k.', time:'1 minggu lalu', avatar:'D' },
+    { name:'Ayu W.', rating:5, text:'Juice-nya seger banget! Harga mulai 10k aja. Cemilan asinnya juga enak semua.', time:'1 minggu lalu', avatar:'A' },
+    { name:'Budi S.', rating:5, text:'Nasgor Komplit 35k tapi rasanya bintang lima. Pelayan ramah, tempatnya bersih!', time:'2 minggu lalu', avatar:'B' },
+    { name:'Maya R.', rating:4, text:'Mie Goreng Telor sama Teh Jahe Sereh pas banget dimakan bareng. Enak dan murah!', time:'3 minggu lalu', avatar:'M' },
+];
+const RATING_DIST = { 5:185, 4:38, 3:11, 2:3, 1:1 };
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', () => {
+    renderMenu();
+    renderReviews();
+    renderRatingBars();
+    setupScrollReveal();
+    setupNavScroll();
+    updateOpenStatus();
+    updateCartUI();
+});
+
+// ===================== MENU RENDERING =====================
+function renderMenu() {
+    const container = document.getElementById('menuContainer');
+    const empty = document.getElementById('menuEmpty');
+    const search = currentSearch.toLowerCase();
+    let hasResult = false;
+    let html = '';
+
+    const catsToShow = currentCat === 'all' ? Object.keys(MENU_DATA) : [currentCat];
+
+    catsToShow.forEach(catKey => {
+        const cat = MENU_DATA[catKey];
+        let catHtml = '';
+        let catHasResult = false;
+
+        Object.entries(cat.subcats).forEach(([subcatName, items]) => {
+            const filtered = search ? items.filter(i => i.name.toLowerCase().includes(search) || (i.desc||'').toLowerCase().includes(search)) : items;
+            if (!filtered.length) return;
+            catHasResult = true;
+            hasResult = true;
+            catHtml += `<div class="subcat-header"><div class="line"></div><span class="subcat-title">${subcatName}</span><div class="line"></div></div>`;
+            catHtml += `<div style="display:flex;flex-direction:column;gap:6px;">`;
+            filtered.forEach(item => {
+                let badgeHtml = '';
+                if (item.badge) {
+                    const cls = item.badgeType === 'hot' ? 'badge-hot' : item.badgeType === 'new' ? 'badge-new' : item.badgeType === 'rec' ? 'badge-rec' : 'badge-rec';
+                    badgeHtml = `<span class="${cls}">${item.badge}</span>`;
+                }
+                catHtml += `
+                    <div class="menu-item-row" onclick="addToCart('${item.id}','${catKey}','${subcatName}')">
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                <span class="name">${item.name}</span>
+                                ${badgeHtml}
+                            </div>
+                            ${item.desc ? `<div style="font-size:11px;color:#475569;margin-top:2px;">${item.desc}</div>` : ''}
+                        </div>
+                        <span class="price">${fmtPrice(item.price)}</span>
+                        <button class="btn-add" onclick="event.stopPropagation();addToCart('${item.id}','${catKey}','${subcatName}')">+</button>
+                    </div>
+                `;
+            });
+            catHtml += '</div>';
+        });
+
+        if (catHasResult) {
+            html += `
+                <div style="margin-bottom:28px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                        <h3 style="font-size:15px;font-weight:800;color:white;font-family:'Syne',sans-serif;">${cat.label}</h3>
+                    </div>
+                    ${catHtml}
+                </div>
+            `;
+        }
+    });
+
+    if (!hasResult) {
+        container.innerHTML = '';
+        empty.style.display = 'flex';
+    } else {
+        container.innerHTML = html;
+        empty.style.display = 'none';
+    }
 }
-/* ---- list views ---- */
-const PRE={tracker:()=>true,litigasi:t=>t.cat===LIT,nonlitigasi:t=>t.cat!==LIT,blocked:t=>t.st==='Blocked'};
-let F;
-function vList(tab){
-  F={q:'',st:'ALL',dv:'ALL',p:'ALL',cat:'ALL'};
-  const base=M.filter(PRE[tab]);
-  const opt=(a,lab)=>a.map(x=>`<option value="${esc(x)}">${esc(lab?lab(x):x)}</option>`).join('');
-  const dvs=[...new Set(base.map(x=>x.dv))].sort((a,b)=>a.localeCompare(b));
-  const cs=[...new Set(base.map(x=>x.cat))].sort();
-  $('view').innerHTML=`
-  <section class="panel" style="padding:14px 18px"><div class="tools">
-    <span class="cnt" id="cnt"></span>
-    <input id="q" class="fi" type="search" placeholder="Cari judul, divisi, kategori, catatan" aria-label="Cari">
-    <select id="fs" class="fi" aria-label="Status"><option value="ALL">Semua status</option>${opt(SO.filter(k=>base.some(x=>x.st===k)),k=>ST[k].l)}</select>
-    <select id="fdv" class="fi" aria-label="Divisi"><option value="ALL">Semua divisi</option>${opt(dvs,dvName)}</select>
-    <select id="fp" class="fi" aria-label="Prioritas"><option value="ALL">Semua prioritas</option>${opt(['P0','P1','P2','P3'].filter(p=>base.some(x=>x.p===p)))}</select>
-    <select id="fc" class="fi" aria-label="Kategori"><option value="ALL">Semua kategori</option>${opt(cs)}</select>
-  </div></section>
-  <div class="tw"><table><thead><tr><th title="Nomor baris di sheet Main Tracker">Baris</th><th>Permintaan</th><th>Prio</th><th>Divisi</th><th>Departemen</th><th>Kategori</th><th>Status</th><th>Mulai</th><th>Selesai</th><th title="SLA untuk yang selesai, umur sejak mulai untuk yang belum selesai">SLA / umur</th></tr></thead><tbody id="tb"></tbody></table><div id="em" class="empty" hidden><b>Tidak ada permintaan yang cocok</b>Ubah kata kunci atau <button class="link" id="rs">reset semua filter</button>.</div></div>`;
-  const bind=(id,k,ev)=>$(id).addEventListener(ev,e=>{F[k]=e.target.value;rows(tab)});
-  bind('q','q','input');bind('fs','st','change');bind('fdv','dv','change');bind('fp','p','change');bind('fc','cat','change');
-  $('rs').onclick=()=>{F={q:'',st:'ALL',dv:'ALL',p:'ALL',cat:'ALL'};$('q').value='';['fs','fdv','fp','fc'].forEach(i=>$(i).value='ALL');rows(tab)};
-  rows(tab);
+
+function filterCat(cat, btn) {
+    document.querySelectorAll('.menu-category-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = cat;
+    renderMenu();
 }
-function rows(tab){
-  const q=F.q.trim().toLowerCase();
-  const rs=M.filter(PRE[tab]).filter(t=>(F.st==='ALL'||t.st===F.st)&&(F.dv==='ALL'||t.dv===F.dv)&&(F.p==='ALL'||t.p===F.p)&&(F.cat==='ALL'||t.cat===F.cat)&&(!q||[t.title,t.dv,t.dp,t.cat,t.bu,t.note,t.p,ST[t.st].l].join(' ').toLowerCase().includes(q)));
-  $('cnt').textContent=rs.length+' permintaan';
-  $('tb').innerHTML=rs.map(t=>{
-    let s='–';
-    if(t.st==='Completed'&&t.dur!=null)s=t.dur+' hari';
-    else if(t.st!=='Completed'&&t.age!=null)s=`<span class="warn">umur ${t.age} hari</span>`;
-    return `<tr><td class="rn">${t.row}</td><td class="t-title">${ttl(t)}${t.note?`<small>${esc(t.note)}</small>`:''}${t.bu?`<small>${esc(t.bu)}</small>`:''}</td><td>${pri(t.p)}</td><td>${esc(dvName(t.dv))}</td><td>${esc(t.dp)||'<span class="muted">–</span>'}</td><td>${esc(t.cat)}</td><td>${badge(t.st)}</td><td class="num">${fd(t.sd)}</td><td class="num">${fd(t.ed)}</td><td class="num">${s}</td></tr>`}).join('');
-  $('em').hidden=rs.length>0;
+
+function searchMenu(val) {
+    currentSearch = val;
+    renderMenu();
 }
-/* ---- projects ---- */
-function vProj(){
-  const names=[...new Set(P.map(x=>x.project))];
-  $('view').innerHTML=`<section class="panel"><div class="row" style="gap:26px"><div><b style="font-size:22px">${P.length}</b><div class="muted" style="font-size:12.5px">sub-task</div></div>${SO.filter(k=>projC[k]).map(k=>`<div><b style="font-size:22px;color:var(--${ST[k].c})">${projC[k]}</b><div class="muted" style="font-size:12.5px">${ST[k].l}</div></div>`).join('')}</div></section>
-  <div class="pgrid">${names.map(pn=>{
-    const s=P.filter(x=>x.project===pn),c=cnt(s,x=>x.st);
-    return `<section class="panel proj"><div class="row spread"><h2>${esc(pn)}</h2><span class="muted" style="font-size:12.5px">${c['Completed']||0}/${s.length} selesai</span></div><div style="margin-top:10px">${seg(c)}</div>
-    <ul class="subs">${s.map(x=>`<li><div><div class="nm">${esc(x.sub)}</div><div class="dt">${x.sd?fd(x.sd)+' sampai '+fd(x.ed):'Tanggal belum diisi'}</div></div><div>${badge(x.st)}</div>${x.pi||x.note||x.ca?`<details open><summary>Kendala dan tindak lanjut</summary><dl>${x.note?`<div><dt>Catatan</dt><dd>${esc(x.note)}</dd></div>`:''}${x.pi?`<div><dt>Penyebab (PI)</dt><dd>${esc(x.pi)}</dd></div>`:''}${x.ca?`<div><dt>Tindakan (CA)</dt><dd>${esc(x.ca)}</dd></div>`:''}</dl></details>`:''}</li>`).join('')}</ul></section>`}).join('')}</div>
-  <p class="muted" style="font-size:12.5px">Sheet Project memuat ${D.meta.proj_sheet_rows} baris. Hanya ${P.length} yang berisi nama sub-task. ${D.meta.proj_dup} baris lainnya sama persis dengan baris Main Tracker, jadi tidak dihitung lagi di sini.</p>`;
+
+// ===================== CART =====================
+function addToCart(id, catKey, subcatName) {
+    const items = MENU_DATA[catKey].subcats[subcatName];
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const existing = cart.find(c => c.id === id);
+    if (existing) existing.qty++;
+    else cart.push({ ...item, qty: 1 });
+    updateCartUI();
+    showToast(`✓ ${item.name} ditambahkan!`, 'success');
+    const fab = document.getElementById('cartFab');
+    fab.classList.add('bounce');
+    setTimeout(() => fab.classList.remove('bounce'), 400);
 }
-/* ---- documents ---- */
-function vDocs(){
-  $('view').innerHTML=`<section class="panel"><div class="row" style="gap:26px"><div><b style="font-size:22px">${DOC.length}</b><div class="muted" style="font-size:12.5px">dokumen</div></div>${Object.keys(DS).filter(k=>docC[k]).map(k=>`<div><b style="font-size:22px;color:var(--${DS[k].c})">${docC[k]}</b><div class="muted" style="font-size:12.5px">${DS[k].l}</div></div>`).join('')}</div></section>
-  <section class="panel" style="padding:14px 18px"><div class="tools"><span class="cnt" id="cnt"></span><input id="q" class="fi" type="search" placeholder="Cari nama dokumen, divisi, pihak kedua" aria-label="Cari dokumen"><select id="fs" class="fi" aria-label="Status dokumen"><option value="ALL">Semua status</option>${Object.keys(DS).filter(k=>docC[k]).map(k=>`<option value="${k}">${DS[k].l}</option>`).join('')}</select></div></section>
-  <div class="tw"><table><thead><tr><th>Dokumen</th><th>Divisi</th><th>Kategori</th><th>Pihak kedua</th><th>Mulai</th><th>Berakhir</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table><div id="em" class="empty" hidden><b>Tidak ada dokumen yang cocok</b>Ubah kata kunci atau status.</div></div>`;
-  const draw=()=>{
-    const q=$('q').value.trim().toLowerCase(),s=$('fs').value;
-    const rs=DOC.filter(x=>(s==='ALL'||x.st===s)&&(!q||[x.name,x.dv,x.dp,x.inst,x.cat,x.file].join(' ').toLowerCase().includes(q)));
-    $('cnt').textContent=rs.length+' dokumen';
-    $('tb').innerHTML=rs.map(x=>`<tr><td class="t-title">${esc(x.name)}${x.file?`<small>${esc(x.file)}</small>`:''}</td><td>${esc(x.dv)}<small class="muted" style="display:block;font-size:12px">${esc(x.dp)}</small></td><td>${esc(x.cat)}</td><td>${esc(x.inst)}</td><td class="num">${fd(x.sd)}</td><td class="num">${x.ed?fd(x.ed):'<span class="muted">Belum diisi</span>'}${x.bad?'<small class="warn" style="display:block">Lebih awal dari tanggal mulai</small>':''}</td><td><span class="badge b-${DS[x.st].c}">${DS[x.st].l}</span></td></tr>`).join('');
-    $('em').hidden=rs.length>0;
-  };
-  $('q').addEventListener('input',draw);$('fs').addEventListener('change',draw);draw();
+
+function removeFromCart(id) {
+    cart = cart.filter(c => c.id !== id);
+    updateCartUI();
 }
-/* ---- data notes ---- */
-function vData(){
-  const todo=[
-    ['bad',n31,'Kode divisi 31011',`${n31} tugas memakai nilai ini di kolom Division, ${bk31} di antaranya Terblokir. Nilai yang sama juga ada di daftar Divisi pada sheet Settings, jadi Excel menerimanya sebagai pilihan yang sah. Dashboard menampilkannya apa adanya.`,'Pastikan divisi yang benar, lalu ganti nilainya di Main Tracker dan Settings.'],
-    ['bad',noTitle,'Permintaan tanpa judul',`${noTitle} dari ${N} baris tidak punya isi kolom Request Lists dan Business Unit. Di dashboard tampil sebagai "Tanpa judul" beserta kategorinya.`,'Isi judul permintaan supaya bisa dilacak. Nomor baris Excel ada di kolom pertama tabel.'],
-    ['wip',noDept,'Departemen kosong',`${noDept} baris belum punya Department. Sebanyak ${M.filter(x=>x.dv==='31011').length} di antaranya berasal dari kode divisi 31011.`,'Lengkapi kolom Department.'],
-    ['wip',doneNoEnd+noStart,'Tanggal mulai atau selesai kosong',`${doneNoEnd} tugas Selesai tanpa tanggal selesai dan ${noStart} tugas tanpa tanggal mulai. SLA untuk baris ini tidak bisa dihitung, jadi tidak masuk rata-rata.`,'Isi tanggal yang kosong.'],
-    ['wip',overdue.length,'Tugas berjalan lewat tanggal akhir',`${overdue.length} tugas berstatus In progress dengan tanggal akhir sebelum ${fd(D.today)}.`,'Perbarui status atau tanggal akhirnya.'],
-    ['info',docC.noend||0,'Dokumen tanpa tanggal berakhir',`${docC.noend||0} dari ${DOC.length} dokumen belum punya End date${docBad?`, dan ${docBad} dokumen punya End date lebih awal dari Start date`:''}.`,'Isi tanggal berakhir dan periksa tanggal yang terbalik.']
-  ];
-  const done=[
-    ['Baris terisi',`Main Tracker punya 1.014 baris berformat, tetapi hanya ${N} yang berisi data (baris 2 sampai ${N+1}). Sisanya kosong dan tidak dihitung.`],
-    ['Status',`Semua halaman memakai empat status dari dropdown Excel: Completed, In progress, Blocked, Not started. Labelnya sama di seluruh dashboard: Selesai, Berjalan, Terblokir, Belum mulai.`],
-    ['SLA',`Excel menampilkan tanggal tahun 1773 di kolom SLA saat tanggal selesai kosong. Di sini SLA hanya dihitung bila tanggal mulai dan selesai ada. Rata-rata ${f1(SLA)} hari dihitung dari ${slaList.length} tugas Selesai. Tugas yang belum selesai memakai umur sejak tanggal mulai.`],
-    ['Sheet Project',`Dari ${D.meta.proj_sheet_rows} baris, hanya ${P.length} sub-task yang bernama. ${D.meta.proj_dup} baris sisanya sama persis dengan baris Main Tracker (prioritas, divisi, kategori, status, tanggal), jadi tidak dihitung dua kali.`],
-    ['Status dokumen',`Excel menandai semua ${DOC.length} dokumen sebagai Kedaluwarsa. Di sini status dihitung dari End date terhadap ${fd(D.today)}: ${docC.expired||0} kedaluwarsa dan ${docC.noend||0} belum punya tanggal berakhir.`],
-    ['Ejaan',`"Makerting" di kolom Instansi disamakan menjadi "Marketing". Judul permintaan tidak diubah.`]
-  ];
-  $('view').innerHTML=`<section class="panel"><h2>Perlu dibenahi di Excel</h2><p class="sub">Dashboard tidak menebak isi yang kosong atau meragukan.</p>
-    ${todo.map(x=>`<div class="issue"><div class="k" style="background:var(--${x[0]}-bg);color:var(--${x[0]==='info'?'info':x[0]})">${x[1]}</div><b>${x[2]}</b><span class="d">${x[3]}<div class="fix"><em>Tindakan:</em> ${x[4]}</div></span></div>`).join('')}</section>
-  <section class="panel"><h2>Sudah disamakan di dashboard</h2><p class="sub">Angka di semua halaman berasal dari sheet Main Tracker, Project, dan Document Lists.</p>
-    ${done.map(x=>`<div class="issue"><div class="k" style="background:var(--ok-bg);color:var(--ok);font-size:12px;padding:6px 4px">${x[0]}</div><span class="d" style="grid-column:2;color:var(--text)">${x[1]}</span></div>`).join('')}</section>`;
+
+function changeQty(id, delta) {
+    const item = cart.find(c => c.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) removeFromCart(id);
+    else updateCartUI();
 }
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(cur==='ringkasan')go('ringkasan')});
-go('ringkasan');
+
+function updateCartUI() {
+    const totalItems = cart.reduce((s,c) => s+c.qty, 0);
+    const subtotal = cart.reduce((s,c) => s+c.price*c.qty, 0);
+    const discAmt = Math.round(subtotal * discount / 100);
+    const total = subtotal - discAmt;
+
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = totalItems;
+    totalItems > 0 ? badge.classList.add('visible') : badge.classList.remove('visible');
+    document.getElementById('cartItemCount').textContent = `${totalItems} item`;
+    document.getElementById('emptyCart').style.display = totalItems === 0 ? 'flex' : 'none';
+
+    document.getElementById('cartItems').innerHTML = cart.map(c => `
+        <div class="cart-item">
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:600;color:white;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}</div>
+                <div style="font-size:12px;color:var(--amber);font-weight:700;">${fmtPrice(c.price)}</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:7px;">
+                    <button class="qty-btn" onclick="changeQty('${c.id}',-1)">−</button>
+                    <span style="font-size:13px;font-weight:700;color:white;min-width:18px;text-align:center;">${c.qty}</span>
+                    <button class="qty-btn" onclick="changeQty('${c.id}',1)">+</button>
+                    <button onclick="removeFromCart('${c.id}')" style="margin-left:auto;width:26px;height:26px;border-radius:7px;border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.08);color:#f87171;cursor:pointer;font-size:11px;">✕</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    const summaryEl = document.getElementById('cartSummary');
+    const couponEl = document.getElementById('couponSection');
+    const btn = document.getElementById('checkoutBtn');
+    if (totalItems > 0) {
+        summaryEl.style.display = 'flex'; couponEl.style.display = 'block';
+        btn.disabled = false; btn.style.opacity = '1';
+    } else {
+        summaryEl.style.display = 'none'; couponEl.style.display = 'none';
+        btn.disabled = true; btn.style.opacity = '.5';
+    }
+    document.getElementById('subtotalText').textContent = fmtPrice(subtotal);
+    document.getElementById('discountText').textContent = '-' + fmtPrice(discAmt);
+    document.getElementById('totalText').textContent = fmtPrice(total);
+}
+
+function toggleCart() {
+    const overlay = document.getElementById('cartOverlay');
+    const sidebar = document.getElementById('cartSidebar');
+    overlay.classList.toggle('open');
+    sidebar.classList.toggle('open');
+    document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+}
+
+function applyCoupon() {
+    const code = document.getElementById('couponInput').value.trim().toUpperCase();
+    const msg = document.getElementById('couponMsg');
+    if (COUPONS[code]) {
+        discount = COUPONS[code];
+        msg.innerHTML = `<span style="color:#4ade80;">✓ Diskon ${discount}% diterapkan!</span>`;
+        updateCartUI();
+    } else {
+        msg.innerHTML = `<span style="color:#f87171;">✗ Kode tidak valid.</span>`;
+    }
+}
+
+function clearCart() {
+    cart = []; discount = 0;
+    document.getElementById('couponInput').value = '';
+    document.getElementById('couponMsg').innerHTML = '';
+    updateCartUI();
+}
+
+// ===================== CHECKOUT =====================
+function openCheckout() {
+    if (!cart.length) return;
+    toggleCart();
+    setTimeout(() => {
+        document.getElementById('checkoutModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+        goStep1();
+    }, 350);
+}
+
+function closeCheckout() {
+    document.getElementById('checkoutModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function goStep1() {
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'none';
+    setDots(1);
+}
+
+function goStep2() {
+    const name = document.getElementById('custName').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+    if (!name) { showToast('⚠️ Nama harus diisi!', 'warn'); return; }
+    if (!phone) { showToast('⚠️ Nomor WA harus diisi!', 'warn'); return; }
+
+    const subtotal = cart.reduce((s,c)=>s+c.price*c.qty,0);
+    const discAmt = Math.round(subtotal*discount/100);
+    const total = subtotal - discAmt;
+
+    document.getElementById('orderSummaryItems').innerHTML = cart.map(c=>`
+        <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:#94a3b8;">${c.name} <span style="color:#64748b;">×${c.qty}</span></span>
+            <span style="color:white;font-weight:600;">${fmtPrice(c.price*c.qty)}</span>
+        </div>
+    `).join('');
+    document.getElementById('s2subtotal').textContent = fmtPrice(subtotal);
+    document.getElementById('s2discount').textContent = '-' + fmtPrice(discAmt);
+    document.getElementById('s2total').textContent = fmtPrice(total);
+
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    setDots(2);
+}
+
+async function goStep3() {
+    const name = document.getElementById('custName').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+    const note = document.getElementById('custNote').value.trim();
+    const table = document.getElementById('tableNum').value.trim();
+    const subtotal = cart.reduce((s,c)=>s+c.price*c.qty,0);
+    const discAmt = Math.round(subtotal*discount/100);
+    const total = subtotal - discAmt;
+
+    const orderNum = 'PC-' + Date.now().toString().slice(-8);
+    document.getElementById('orderNumber').textContent = '#' + orderNum;
+
+    const lines = cart.map(c=>`• ${c.name} x${c.qty} = ${fmtPrice(c.price*c.qty)}`).join('%0A');
+    const typeText = orderType === 'dine-in' ? 'Makan di Sini' + (table ? ` (${table})` : '') : 'Bawa Pulang';
+    const msg = `Halo Pak Cikur!%0A%0A*Pesanan Baru — #${orderNum}*%0ANama: ${name}%0AWA: ${phone}%0ATipe: ${typeText}%0A%0A*Detail:*%0A${lines}%0A%0A*Total: ${fmtPrice(total)}*${note?'%0ACatatan: '+note:''}%0A%0ATerima kasih!`;
+    document.getElementById('waConfirmBtn').onclick = () => window.open(`https://wa.me/6285863927084?text=${msg}`,'_blank');
+
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'block';
+    setDots(3);
+
+    // Kirim ke jembatan (Google Sheets) supaya otomatis muncul di kasir
+    sendOrderToBridge({
+        orderNum, name, phone, note, table,
+        orderType, items: cart.map(c=>({id:c.id,name:c.name,price:c.price,qty:c.qty})),
+        discountPct: discount, subtotal, discAmt, total,
+        time: new Date().toISOString()
+    });
+}
+
+async function sendOrderToBridge(order) {
+    const dot = document.getElementById('syncDot');
+    const text = document.getElementById('syncText');
+    if (!BRIDGE_URL || BRIDGE_URL.indexOf('PASTE_URL') !== -1) {
+        dot.classList.add('fail');
+        text.textContent = 'Bridge belum diatur — pesanan hanya lewat WA';
+        return;
+    }
+    try {
+        await fetch(BRIDGE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari preflight CORS
+            body: JSON.stringify({ action: 'create', order })
+        });
+        dot.classList.add('ok');
+        text.textContent = 'Tersinkron ke kasir ✓';
+    } catch (err) {
+        dot.classList.add('fail');
+        text.textContent = 'Gagal sinkron ke kasir, tetap lanjut via WA';
+    }
+}
+
+function setDots(n) {
+    [1,2,3].forEach(i => {
+        const d = document.getElementById('dot'+i);
+        i===n ? d.classList.add('active') : d.classList.remove('active');
+    });
+}
+
+function selectOrderType(type, btn) {
+    orderType = type;
+    document.querySelectorAll('.order-type-btn').forEach(b => {
+        b.style.borderColor = 'var(--border)';
+        b.style.background = 'var(--bg-card)';
+        b.style.color = '#94a3b8';
+    });
+    btn.style.borderColor = 'rgba(245,158,11,0.4)';
+    btn.style.background = 'rgba(245,158,11,0.08)';
+    btn.style.color = 'var(--amber)';
+    document.getElementById('tableField').style.display = type === 'dine-in' ? 'block' : 'none';
+}
+
+// ===================== REVIEWS =====================
+function renderReviews() {
+    const grid = document.getElementById('reviewGrid');
+    grid.innerHTML = REVIEWS_DATA.slice(0, reviewsShown).map(r => `
+        <div class="review-card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:38px;height:38px;border-radius:11px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--amber);font-family:'Syne',sans-serif;">${r.avatar}</div>
+                <div>
+                    <div style="font-size:13px;font-weight:600;color:white;">${r.name}</div>
+                    <div style="font-size:10px;color:#475569;">${r.time}</div>
+                </div>
+                <div style="margin-left:auto;font-size:13px;color:var(--amber);">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+            </div>
+            <p style="font-size:12px;color:#94a3b8;line-height:1.7;">"${r.text}"</p>
+        </div>
+    `).join('');
+}
+
+function renderRatingBars() {
+    const total = Object.values(RATING_DIST).reduce((a,b)=>a+b,0);
+    document.getElementById('ratingBars').innerHTML = [5,4,3,2,1].map(s => {
+        const pct = Math.round(RATING_DIST[s]/total*100);
+        return `
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;">
+                <span style="color:#94a3b8;width:7px;">${s}</span>
+                <span style="color:var(--amber);font-size:10px;">★</span>
+                <div style="flex:1;height:5px;background:var(--bg-base);border-radius:3px;overflow:hidden;">
+                    <div style="height:100%;width:${pct}%;background:var(--amber);border-radius:3px;"></div>
+                </div>
+                <span style="color:#475569;width:26px;text-align:right;">${RATING_DIST[s]}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function loadMoreReviews() {
+    reviewsShown = Math.min(reviewsShown+3, REVIEWS_DATA.length);
+    renderReviews();
+}
+
+function openReviewModal() {
+    document.getElementById('reviewModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeReviewModal() {
+    document.getElementById('reviewModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+function setRating(val) {
+    currentRating = val;
+    document.querySelectorAll('.star').forEach(s => s.classList.toggle('active', parseInt(s.dataset.val)<=val));
+}
+function submitReview() {
+    const name = document.getElementById('reviewName').value.trim();
+    const text = document.getElementById('reviewText').value.trim();
+    if (!name||!text||!currentRating) { showToast('⚠️ Lengkapi semua field!','warn'); return; }
+    REVIEWS_DATA.unshift({ name, rating:currentRating, text, time:'Baru saja', avatar:name.charAt(0).toUpperCase() });
+    reviewsShown = Math.min(reviewsShown+1, REVIEWS_DATA.length);
+    renderReviews();
+    closeReviewModal();
+    showToast('🎉 Ulasan berhasil dikirim!','success');
+    document.getElementById('reviewName').value='';
+    document.getElementById('reviewText').value='';
+    currentRating=0;
+    document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));
+}
+
+// ===================== LIGHTBOX =====================
+function openLightbox(src) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// ===================== TOAST =====================
+function showToast(msg, type='success') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    const colors = { success:'#4ade80', warn:'#fbbf24', error:'#f87171' };
+    t.innerHTML = `<span style="color:${colors[type]||colors.success};font-size:14px;">${type==='success'?'✓':type==='warn'?'!':'✕'}</span><span style="font-size:12px;color:#e2e8f0;">${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => {
+        t.style.opacity='0'; t.style.transform='translateX(60px)'; t.style.transition='all .3s ease';
+        setTimeout(()=>t.remove(), 300);
+    }, 2800);
+}
+
+// ===================== HELPERS =====================
+function fmtPrice(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+
+function updateOpenStatus() {
+    const h = new Date().getHours();
+    const isOpen = h >= 8 && h < 22;
+    ['openStatus','openStatus2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.className = 'chip ' + (isOpen ? 'chip-open' : 'chip-closed');
+            el.innerHTML = `<span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;"></span> ${isOpen ? 'Sedang Buka' : 'Sedang Tutup'}`;
+        }
+    });
+}
+
+function setupScrollReveal() {
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
+
+function setupNavScroll() {
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+    });
+}
+
+// ===================== MOBILE MENU =====================
+function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+    const menu = document.getElementById('mobileMenu');
+    const ham = document.getElementById('hamburger');
+    if (menu.classList.contains('open') && !menu.contains(e.target) && !ham.contains(e.target)) {
+        menu.classList.remove('open');
+    }
+});
 </script>
 </body>
 </html>
